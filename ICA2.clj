@@ -19,7 +19,7 @@
 (defn has-vertex? [label graph]
   (contains? @(:vertices graph) label))
 
-(defn add-vertex! [graph label latitude longitude]
+(defn graph-add-vertex! [graph label latitude longitude]
   (when (not (has-vertex? label graph))
     (let [vertices @(:vertices graph)]
       (dosync
@@ -33,7 +33,7 @@
 
 (defn has-edge? [graph to from] (contains? @(:edges graph) (edge-key to from)))
 
-(defn add-edge! [graph from to label weight]
+(defn graph-add-edge! [graph from to label weight]
   (when (not (has-edge? graph to from))
     (dosync
       (ref-set
@@ -45,3 +45,6 @@
         (conj @(:neighbors (get @(:vertices graph) from)) to))
       (ref-set (:neighbors (get @(:vertices graph) to))
         (conj @(:neighbors (get @(:vertices graph) from)) from)))))
+
+(defn get-edge [g t f]
+  (get @(:edges g) (edge-key t f)))

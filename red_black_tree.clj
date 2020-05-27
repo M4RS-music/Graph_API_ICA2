@@ -92,11 +92,10 @@
     (and (= parent-child Right) (= node-child Right)) (right-right-case! grandparent))))
 
 (defn red-black-rules-checker! [node]
-  (when (not (node-root? (:parent @node)))
-    (when (= (color-of-parent node) Red)
-      (if (= (color-of-uncle node) Red)
-        (red-parent-red-uncle-fix! node)
-        (red-parent-black-uncle-checker! node)))))
+  (when (= (color-of-parent node) Red)
+    (if (= (color-of-uncle node) Red)
+      (red-parent-red-uncle-fix! node)
+      (red-parent-black-uncle-checker! node))))
 
 (defn node-insert-helper! [node parent label value child]
   (if (node-empty? node)
@@ -125,3 +124,19 @@
         (node-insert-helper! (:right @(:root tree)) (:root tree) label value Right)
       (= value @(:value @(:root tree)))
         (node-insert-helper! (:right @(:root tree)) (:root tree) label value Right))))
+
+(defn print-tree [node]
+  (when (not (node-empty? node))
+    (println "Label: " (:label @node))
+    (println "Value: " @(:value @node))
+    (if (= @(:color @node) 0)
+      (println "Color: Black")
+      (println "Color: Red"))
+    (if (= @(:child @node) 2)
+      (println "Child: Left")
+      (if (nil? @(:child @node))
+        (println "Child: Root")
+        (println "Child: Right")))
+    (println "=======================")
+    (print-tree (:left @node))
+    (print-tree (:right @node))))
