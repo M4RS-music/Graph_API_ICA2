@@ -14,6 +14,8 @@
 
 (defn make-graph [] (Graph. (ref {}) (ref {})))
 
+(def g (make-graph))
+
 (defn has-vertex? [label graph]
   (contains? @(:vertices graph) label))
 
@@ -40,6 +42,6 @@
           (edge-key to from)
           (Edge. from to weight label)))
       (ref-set (:neighbors (get @(:vertices graph) from))
-        (cons to @(:neighbors (get @(:vertices graph)))))
+        (conj @(:neighbors (get @(:vertices graph) from)) to))
       (ref-set (:neighbors (get @(:vertices graph) to))
-        (cons from @(:neighbors (get @(:vertices graph))))))))
+        (conj @(:neighbors (get @(:vertices graph) from)) from)))))
