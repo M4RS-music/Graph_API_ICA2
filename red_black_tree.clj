@@ -21,25 +21,20 @@
 (defn node-root? [node]
   (nil? @(:parent @node)))
 
-(defn make-node [label value color parent child]
+(defn make-node! [label value color parent child]
   (Red-Black-Node. label (ref value) (ref color) (ref nil-leaf) (ref nil-leaf) (ref parent) (ref child)))
-
-(defn color-of-uncle [node]
-  (let [parent (:parent @node)]
-    (if (= @(:child @parent) Left)
-      @(:color @(:right @(:parent @(:parent @node))))
-      @(:color @(:left @(:parent @(:parent @node)))))))
-
-(defn get-uncle [node]
-  (let [parent (:parent @node)]
-    (if (= @(:child @parent) Left)
-      (:right @(:parent @(:parent @node)))
-      (:left @(:parent @(:parent @node))))))
 
 (defn get-sibling [node]
   (if (= @(:child @node) Left)
     (:right @(:parent @node))
     (:left @(:parent @node))))
+
+(defn get-uncle [node]
+  (let [parent (:parent @node)]
+    (get-sibling parent)
+
+(defn color-of-uncle [node]
+  @(:color (get-uncle node))
 
 (defn color-of-parent [node]
   @(:color @(:parent @node)))
@@ -104,7 +99,7 @@
     (do
       (dosync
         (ref-set node
-          (make-node label value Red parent child)))
+          (make-node! label value Red parent child)))
       (red-black-rules-checker! node))
     (cond
       (< value @(:value @node))
@@ -118,7 +113,7 @@
   (if (red-black-tree-empty? tree)
     (dosync
       (ref-set (:root tree)
-        (make-node label value Black nil nil)))
+        (make-node! label value Black nil nil)))
     (cond
       (< value @(:value @(:root tree)))
         (node-insert-helper! (:left @(:root tree)) (:root tree) label value Left)
