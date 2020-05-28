@@ -91,8 +91,10 @@
     (and (= parent-child Right) (= node-child Left)) (right-left-case! parent)
     (and (= parent-child Right) (= node-child Right)) (right-right-case! grandparent))))
 
+;;The color of parent does not work. parent reference is broken **...
+
 (defn red-black-rules-checker! [node]
-  (when (= (color-of-parent node) Red)
+  (when (= @(:color @(:parent @node)) Red)
     (if (= (color-of-uncle node) Red)
       (red-parent-red-uncle-fix! node)
       (red-parent-black-uncle-checker! node))))
@@ -140,3 +142,21 @@
     (println "=======================")
     (print-tree (:left @node))
     (print-tree (:right @node))))
+
+;;start with root node of tree
+
+(defn pick-least-node [node]
+  (if (not (node-empty? (:left @node)))
+    (pick-least-node (:left @node))
+    (:label @node)))
+
+;;** This proves parent reference does not work.
+
+(defn pop-least-node! [node]
+  (if (not (node-empty? (:left @node)))
+    (pick-least-node (:left @node))
+    (dosync
+      (:label @node)
+      (ref-set
+        (:left @(:parent @node))
+        nil-leaf))))
