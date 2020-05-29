@@ -19,8 +19,8 @@
 (defn hash-label [label] (.hashCode label))
 (defn make-red-black-tree-map! [] (Red-Black-Tree-Map. (ref nil-leaf)))
 
-(defn make-graph [] (Graph. (def v-tree (make-red-black-tree-map!))
-                            (def e-tree (make-red-black-tree-map!))))
+(defn make-graph [] (Graph. (def v-tree (ref (make-red-black-tree-map!)))
+                            (def e-tree (ref (make-red-black-tree-map!)))))
 
 (defn red-black-tree-map-empty? [tree] (= @(:root tree) nil-leaf))
 
