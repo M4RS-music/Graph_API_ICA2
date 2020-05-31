@@ -21,6 +21,7 @@
 
 (defn make-graph [] (Graph. (def v-tree (ref (make-red-black-tree-map!)))
                             (def e-tree (ref (make-red-black-tree-map!)))))
+(def g (make-graph))
 
 (defn red-black-tree-map-empty? [tree] (= @(:root tree) nil-leaf))
 
@@ -42,10 +43,10 @@
 
 (defn get-uncle [node]
   (let [parent (:parent @node)]
-    (get-sibling parent)
+    (get-sibling parent)))
 
 (defn color-of-uncle [node]
-  @(:color (get-uncle node))
+  @(:color (get-uncle node)))
 
 (defn color-of-parent [node]
   @(:color @(:parent @node)))
@@ -137,11 +138,15 @@
         nil
         hashed-label
         (Vertex. label (ref nil) latitude longitude (ref unseen) (ref ##Inf) (ref nil))
-        child))))
+        nil))))
 
-;;start with root node of tree;;
+(defn edge-key [to from] (sort (list to from)))
 
-(defn print-hash-tree [node]
+(defn graph-add-edge! [graph from to label distance]
+  (let [hashed-edge-key (hash-label (edge-key from to))]
+    ))
+
+(defn print-hash-tree-vertex [node]
   (when (not (node-empty? node))
     (println "Hash Value: " (:hashl @node))
     (println "Label: " (:label @(:vertex @node)))
@@ -155,8 +160,4 @@
       (if (nil? @(:child @node))
         (println "Child: Root")
         (println "Child: Right")))
-    (println "=======================")
-    (print-tree (:left @node))
-    (print-tree (:right @node))))
-
-;;start with root node of tree
+    (println "=======================")))

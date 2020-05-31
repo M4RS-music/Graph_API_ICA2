@@ -31,10 +31,10 @@
 
 (defn get-uncle [node]
   (let [parent (:parent @node)]
-    (get-sibling parent)
+    (get-sibling parent)))
 
 (defn color-of-uncle [node]
-  @(:color (get-uncle node))
+  @(:color (get-uncle node)))
 
 (defn color-of-parent [node]
   @(:color @(:parent @node)))
