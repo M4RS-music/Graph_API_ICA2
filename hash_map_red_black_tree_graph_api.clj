@@ -129,8 +129,11 @@
   (if (node-empty? node)
     (do
       (dosync
-        (ref-set node
-          (make-map-node! hashed-label grecord Red parent child)))
+        (if (= child Root)
+          (ref-set node
+            (make-map-node! hashed-label grecord Black parent child))
+          (ref-set node
+            (make-map-node! hashed-label grecord Red parent child))))
       (red-black-rules-checker! node)
       (when is-edge?
         (neighbor-set! @(:to @(:grecord @node)) @(:from @(:grecord @node)))))
@@ -179,9 +182,10 @@
 
 (defn print-hash-tree-vertex [node]
   (println "Hash Value: " @(:hashl @node))
-  (println "Label: " (:label @(:vertex @node)))
-  (println "Latitude: " (:latitude @(:vertex @node)))
-  (println "Longitude: " (:longitude @(:vertex @node)))
+  (println "Label: " (:label @(:grecord @node)))
+  (println "Latitude: " (:latitude @(:grecord @node)))
+  (println "Longitude: " (:longitude @(:grecord @node)))
+  (println "Neighbors: " (:neighbors @(:grecord @node)))
   (if (= @(:color @node) 0)
     (println "Color: Black")
     (println "Color: Red"))
@@ -194,10 +198,10 @@
 
 (defn print-hash-tree-edge [node]
   (println "Hash Value: " @(:hashl @node))
-  (println "Label: " (:label @(:vertex @node)))
-  (println "From: " (:from @(:vertex @node)))
-  (println "To: " (:to @(:vertex @node)))
-  (println "Wight: " (:weight @(:vertex @node)))
+  (println "Label: " (:label @(:grecord @node)))
+  (println "From: " (:from @(:grecord @node)))
+  (println "To: " (:to @(:grecord @node)))
+  (println "Wight: " (:weight @(:grecord @node)))
   (if (= @(:color @node) 0)
     (println "Color: Black")
     (println "Color: Red"))
