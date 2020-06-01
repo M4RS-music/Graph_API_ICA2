@@ -1,7 +1,7 @@
 ;;Uses hash on labels to allow node lookup via label;;
 
 (defrecord Red-Black-Tree-Map [root])
-(defrecord Red-Black-Map-Node [hashl vertex color left right parent child])
+(defrecord Red-Black-Map-Node [hashl grecord color left right parent child])
 (def ^:const Black 0)
 (def ^:const Red 1)
 (def ^:const Left 2)
@@ -105,29 +105,53 @@
         (red-parent-red-uncle-fix! node)
         (red-parent-black-uncle-checker! node)))))
 
-(defn map-node-insert-helper! [node parent hashed-label grecord child]
+(defn get-node [hashed-label node]
+  (cond
+    (< hashed-label @(:hashl @node))
+      (get-node hashed-label (:left @node))
+    (> hashed-label @(:hashl @node))
+      (get-node hashed-label (:right @node))
+    (= hashed-label @(:hashl @node))
+      node
+    (node-empty? node)
+      false))
+
+(defn neighbor-set! [to from]
+  (let [to-neighbors @(:neighbors @(get-node (hash-label to (:root @(:vertices g)))))
+        from-neighbors @(:neighbors @(get-node (hash-label from (:root @(:vertices g)))))]
+    (dosync
+      (ref-set (get-node (hash-label to (:root @(:vertices g))))
+        (conj to-neighbors from))
+      (ref-set (get-node (hash-label from (:root @(:vertices g))))
+        (conj from-neighbors to)))))
+
+(defn map-node-insert-helper! [node parent hashed-label grecord child is-edge?]
   (if (node-empty? node)
     (do
       (dosync
         (ref-set node
           (make-map-node! hashed-label grecord Red parent child)))
-      (red-black-rules-checker! node))
+      (red-black-rules-checker! node)
+      (when is-edge?
+        (neighbor-set! @(:to @(:grecord @node)) @(:from @(:grecord @node)))))
     (cond
       (< hashed-label @(:hashl @node))
-        (map-node-insert-helper! (:left @node) node hashed-label grecord Left)
+        (map-node-insert-helper! (:left @node) node hashed-label grecord Left is-edge?)
       (> hashed-label @(:hashl @node))
-        (map-node-insert-helper! (:right @node) node hashed-label grecord Right)
+        (map-node-insert-helper! (:right @node) node hashed-label grecord Right is-edge?)
       (= hashed-label @(:hashl @node))
-        (map-node-insert-helper! (:right @node) node hashed-label grecord Right))))
+        (map-node-insert-helper! (:right @node) node hashed-label grecord Right is-edge?))))
 
 (defn red-black-hashmap-contains? [hashed-label node]
-  (if (node-empty? node)
-    false
-    (if (= hashed-label @(:hashl @node))
-      true
-      (if (< hashed-label @(:hashl @node))
-        (red-black-hashmap-contains? hashed-label (:left @node))
-        (red-black-hashmap-contains? hashed-label (:right @node))))))
+  (cond
+    (node-empty? node)
+      false
+    (= hashed-label @(:hashl @node))
+        true
+    (< hashed-label @(:hashl @node))
+      (red-black-hashmap-contains? hashed-label (:left @node))
+    (> hashed-label @(:hashl @node))
+      (red-black-hashmap-contains? hashed-label (:right @node))))
 
 (defn graph-add-vertex! [graph label latitude longitude]
   (let [hashed-label (hash-label label)]
@@ -136,8 +160,9 @@
         (:root @(:vertices graph))
         nil
         hashed-label
-        (Vertex. label (ref nil) latitude longitude (ref unseen) (ref ##Inf) (ref nil))
-        Root))))
+        (Vertex. label (ref '()) latitude longitude (ref unseen) (ref ##Inf) (ref nil))
+        Root
+        false))))
 
 (defn edge-key [to from] (sort (list to from)))
 
@@ -149,7 +174,8 @@
         nil
         hashed-edge-key
         (Edge. from to weight label)
-        Root)))
+        Root
+        true)))
 
 (defn print-hash-tree-vertex [node]
   (println "Hash Value: " @(:hashl @node))
