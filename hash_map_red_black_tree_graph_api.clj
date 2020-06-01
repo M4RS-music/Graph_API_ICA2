@@ -120,9 +120,9 @@
   (let [to-neighbors @(:neighbors @(get-node (hash-label to (:root @(:vertices g)))))
         from-neighbors @(:neighbors @(get-node (hash-label from (:root @(:vertices g)))))]
     (dosync
-      (ref-set (get-node (hash-label to (:root @(:vertices g))))
+      (ref-set (:neighbors @(get-node (hash-label to (:root @(:vertices g)))))
         (conj to-neighbors from))
-      (ref-set (get-node (hash-label from (:root @(:vertices g))))
+      (ref-set (:neighbors @(get-node (hash-label from (:root @(:vertices g)))))
         (conj from-neighbors to)))))
 
 (defn map-node-insert-helper! [node parent hashed-label grecord child is-edge?]
@@ -185,7 +185,7 @@
   (println "Label: " (:label @(:grecord @node)))
   (println "Latitude: " (:latitude @(:grecord @node)))
   (println "Longitude: " (:longitude @(:grecord @node)))
-  (println "Neighbors: " (:neighbors @(:grecord @node)))
+  (println "Neighbors: " @(:neighbors @(:grecord @node)))
   (if (= @(:color @node) 0)
     (println "Color: Black")
     (println "Color: Red"))

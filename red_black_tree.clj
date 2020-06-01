@@ -149,7 +149,7 @@
 
 (defn pop-least-node! [node]
   (if (not (node-empty? (:left @node)))
-    (pick-least-node (:left @node))
+    (pop-least-node (:left @node))
     (dosync
       (:label @node)
       (ref-set
