@@ -49,6 +49,8 @@
 (defn color-of-parent [node]
   @(:color @(:parent @node)))
 
+(declare red-black-rules-checker!)
+
 (defn red-parent-red-uncle-fix! [node]
   (let [uncle (get-uncle node)
         parent  (:parent @node)
@@ -133,7 +135,7 @@
           (ref-set node
             (make-map-node! hashed-label grecord Black parent child))
           (ref-set node
-            (make-map-node! hashed-label grecord Red parent child))))
+            (make-map-node! hashed-label grecord Red @parent child))))
       (red-black-rules-checker! node)
       (when is-edge?
         (neighbor-set! @(:to @(:grecord @node)) @(:from @(:grecord @node)))))

@@ -39,6 +39,8 @@
 (defn color-of-parent [node]
   @(:color @(:parent @node)))
 
+(declare red-black-rules-checker!)
+
 (defn red-parent-red-uncle-fix! [node]
   (let [uncle (get-uncle node)
         parent  (:parent @node)
@@ -99,7 +101,7 @@
     (do
       (dosync
         (ref-set node
-          (make-node! label value Red parent child)))
+          (make-node! label value Red @parent child)))
       (red-black-rules-checker! node))
     (cond
       (< value @(:value @node))
@@ -149,7 +151,7 @@
 
 (defn pop-least-node! [node]
   (if (not (node-empty? (:left @node)))
-    (pop-least-node (:left @node))
+    (pop-least-node! (:left @node))
     (dosync
       (:label @node)
       (ref-set
