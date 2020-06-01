@@ -1,5 +1,6 @@
-;;Uses hash on labels to allow node lookup via label;;
-
+;;Uses hash on labels to allow node lookup via label.
+;;Each node keeps track of its hash value, graph record structure, color, children, parent
+;;and of which child it is to its parent.
 (defrecord Red-Black-Tree-Map [root])
 (defrecord Red-Black-Map-Node [hashl grecord color left right parent child])
 (def ^:const Black 0)
@@ -12,6 +13,8 @@
 (defrecord Graph [vertices edges])
 (defrecord Edge [from to weight label])
 (defrecord Vertex [label neighbors latitude longitude status distance component])
+;;These are the record structures and constants for the graph.
+;;Edge or Vertex are stored in grecord of Red-Black-Map-Node.
 (def ^:const unseen 4)
 (def ^:const in-queue 5)
 (def ^:const current 6)
@@ -21,10 +24,11 @@
 (defn make-red-black-tree-map! [] (Red-Black-Tree-Map. (ref (make-nil-node Root))))
 (def v-tree (ref (make-red-black-tree-map!)))
 (def e-tree (ref (make-red-black-tree-map!)))
-
+;;Creating rb tree maps for the Graph.
 (defn make-graph [] (Graph. v-tree e-tree))
 (def g (make-graph))
-
+;;Created graph.
+;;;;;;;;;;;;;Helper Functions For Insertions and Checking Rules ;;;;;;;;;;;;;;;;
 (defn node-root? [node] (= @(:child node) Root))
 
 (defn red-black-tree-map? [tree] (= (class tree) Red-Black-Tree))
@@ -48,6 +52,8 @@
 
 (defn color-of-parent [node]
   @(:color @(:parent @node)))
+
+;;;;;;;;;;;;;;;;; Functions For Checking and Fixing Color Rules ;;;;;;;;;;;;;;;;
 
 (declare red-black-rules-checker!)
 
@@ -98,7 +104,7 @@
     (and (= parent-child Right) (= node-child Left)) (right-left-case! parent)
     (and (= parent-child Right) (= node-child Right)) (right-right-case! grandparent))))
 
-;;The color of parent does not work. parent reference is broken **...
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Node Insertion ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defn red-black-rules-checker! [node]
   (when (not (= @(:child @node) Root))
@@ -158,6 +164,8 @@
     (> hashed-label @(:hashl @node))
       (red-black-hashmap-contains? hashed-label (:right @node))))
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Graph Insertion ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 (defn graph-add-vertex! [graph label latitude longitude]
   (let [hashed-label (hash-label label)]
     (when (not (red-black-hashmap-contains? hashed-label (:root @(:vertices graph))))
@@ -181,6 +189,8 @@
         (Edge. from to weight label)
         Root
         true)))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Debugging ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defn print-hash-tree-vertex [node]
   (println "Hash Value: " @(:hashl @node))
