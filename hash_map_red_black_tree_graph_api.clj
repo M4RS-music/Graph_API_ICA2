@@ -290,6 +290,44 @@
           (:left @(:parent @node))
           (make-nil-node Left))))))
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;; Breadth First Search ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;;;;Reseting the distance and status of every vertex;;;
+(defn graph-reset-helper! [node]
+  (when (not (node-empty? node))
+  (println "Reset one node")
+    (dosync
+      (ref-set (:status @(:grecord @node)) unseen)
+      (ref-set (:distance @(:grecord @node)) ##Inf))
+  (graph-reset-helper! (:left @node))
+  (graph-reset-helper! (:right @node))))
+
+(defn graph-reset! [graph]
+  (graph-reset-helper! (:root @(:vertices graph))))
+;;;;Reseting the distance and status of every vertex;;;
+
+;;;;Status of vertex;;;;
+(defn vertex-unseen? [node]
+  (= @(:status @(:grecord @node)) unseen))
+
+(defn vertex-current? [node]
+  (= @(:status @(:grecord @node)) current))
+
+(defn vertex-in-queue? [node]
+  (= @(:status @(:grecord @node)) in-queue))
+
+(defn vertex-visited? [node]
+  (= @(:status @(:grecord @node)) visited))
+;;;;Status of vertex;;;;
+
+;;;;Get;;;;
+(defn get-vertex [graph label]
+  (:grecord @(get-node (hash-label label) (:root @(:vertices graph)))))
+
+(defn get-edge [graph from to]
+  (:grecord @(get-node (hash-label (edge-key from to)) (:root @(:edges graph)))))
+;;;;Get;;;;
+
 ;;;;;;;;;;;;;;;;;;;;;;; Debugging Queue and Graph ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defn print-vertex [node]
