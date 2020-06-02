@@ -57,10 +57,12 @@
 
 (defn tree-node-empty? [node] (nil? (:label @node)))
 
-(defn red-black-tree-empty? [tree] (nil? (:label @(:root tree))))
+(defn red-black-tree-empty? [tree] (tree-node-empty? (:root tree)))
+
+(defn red-black-map-empty? [tree] (node-empty? (:root tree))))
 
 (defn make-map-node! [hashed-label grecord color parent child]
-  (Red-Black-Map-Node. (ref hashed-label) (ref grecord) (ref color) (ref (make-nil-node Left)) (ref (make-nil-node Right)) (ref parent) (ref child)))
+  (Red-Black-Map-Node. (ref hashed-label) (ref grecord) (ref color) (ref (make-nil-map-node Left)) (ref (make-nil-map-node Right)) (ref parent) (ref child)))
 
 (defn make-node! [label value color parent child]
   (Red-Black-Node. label (ref value) (ref color) (ref nil-leaf) (ref nil-leaf) (ref parent) (ref child)))
@@ -75,7 +77,7 @@
     (get-sibling parent)))
 
 (defn color-of-uncle [node]
-  @(:color (get-uncle node)))
+  @(:color @(get-uncle node)))
 
 (defn color-of-parent [node]
   @(:color @(:parent @node)))
@@ -89,12 +91,11 @@
         parent  (:parent @node)
         grandparent (:parent @(:parent @node))]
     (dosync
-      (ref-set (:color parent) Black)
-      (ref-set (:color uncle) Black)
-      (when (not (node-root? grandparent))
-        (ref-set (:color grandparent) Red)))
-    (when (not (node-root? grandparent))
-      (red-black-rules-checker! grandparent))))
+      (ref-set (:color @parent) Black)
+      (ref-set (:color @uncle) Black)
+      (when (not (node-root? @grandparent))
+        (ref-set (:color @grandparent) Red)))
+      (red-black-rules-checker! grandparent)))
 
 (defn left-rotate! [node] nil)
 
@@ -108,7 +109,7 @@
 
 (defn left-right-case! [parent]
   (left-rotate! parent)
-  (left-left-case! (:parent @(:parent @parent))))
+  (left-left-case! (:parent @(:parent parent))))
 
 (defn right-right-case! [grandparent]
   (left-rotate! grandparent)
@@ -118,7 +119,7 @@
 
 (defn right-left-case! [parent]
   (right-rotate! parent)
-  (right-right-case! (:parent @(:parent @parent))))
+  (right-right-case! (:parent @(:parent parent))))
 
 (defn red-parent-black-uncle-checker! [node]
   (let [parent  @(:parent @node)
@@ -133,7 +134,7 @@
 
 (defn red-black-rules-checker! [node]
   (when (not (= @(:child @node) Root))
-    (when (= @(:color @(:parent @node)) Red)
+    (when (= (color-of-parent node) Red)
       (if (= (color-of-uncle node) Red)
         (red-parent-red-uncle-fix! node)
         (red-parent-black-uncle-checker! node)))))
@@ -152,8 +153,8 @@
       false))
 
 (defn neighbor-set! [to from]
-  (let [to-neighbors @(:neighbors @(get-node (hash-label to (:root @(:vertices g)))))
-        from-neighbors @(:neighbors @(get-node (hash-label from (:root @(:vertices g)))))]
+  (let [to-neighbors @(:neighbors @(get-node (hash-label to) (:root @(:vertices g))))
+        from-neighbors @(:neighbors @(get-node (hash-label from) (:root @(:vertices g))))]
     (dosync
       (ref-set (:neighbors @(get-node (hash-label to (:root @(:vertices g)))))
         (conj to-neighbors from))
@@ -164,20 +165,29 @@
   (if (node-empty? node)
     (do
       (dosync
-        (if (= child Root)
-          (ref-set node
-            (make-map-node! hashed-label grecord Black parent child))
-          (ref-set node
-            (make-map-node! hashed-label grecord Red @parent child))))
+        (ref-set node
+          (make-map-node! hashed-label grecord Red @parent child)))
       (red-black-rules-checker! node)
       (when is-edge?
-        (neighbor-set! @(:to @(:grecord @node)) @(:from @(:grecord @node)))))
+        (neighbor-set! (:to @(:grecord @node)) (:from @(:grecord @node)))))
     (cond
       (< hashed-label @(:hashl @node))
         (map-node-insert-helper! (:left @node) node hashed-label grecord Left is-edge?)
       (> hashed-label @(:hashl @node))
-        (map-node-insert-helper! (:right @node) node hashed-label grecord Right is-edge?)
-      (= hashed-label @(:hashl @node))
+        (map-node-insert-helper! (:right @node) node hashed-label grecord Right is-edge?))))
+
+(defn map-node-insert-helper-2! [node parent hashed-label grecord is-edge?]
+  (if (node-empty? node)
+    (do
+      (dosync
+        (ref-set node
+          (make-map-node! hashed-label grecord Black parent Root)))
+      (when is-edge?
+        (neighbor-set! (:to @(:grecord @node)) (:from @(:grecord @node)))))
+    (cond
+      (< hashed-label @(:hashl @node))
+        (map-node-insert-helper! (:left @node) node hashed-label grecord Left is-edge?)
+      (> hashed-label @(:hashl @node))
         (map-node-insert-helper! (:right @node) node hashed-label grecord Right is-edge?))))
 
 (defn red-black-hashmap-contains? [hashed-label node]
@@ -196,12 +206,11 @@
 (defn graph-add-vertex! [graph label latitude longitude]
   (let [hashed-label (hash-label label)]
     (when (not (red-black-hashmap-contains? hashed-label (:root @(:vertices graph))))
-      (map-node-insert-helper!
+      (map-node-insert-helper-2!
         (:root @(:vertices graph))
         nil
         hashed-label
         (Vertex. label (ref '()) latitude longitude (ref unseen) (ref ##Inf) (ref nil))
-        Root
         false))))
 
 (defn edge-key [to from] (sort (list to from)))
@@ -209,12 +218,11 @@
 (defn graph-add-edge! [graph from to label weight]
   (let [hashed-edge-key (hash-label (edge-key from to))]
     (when (not (red-black-hashmap-contains? hashed-edge-key (:root @(:edges graph)))))
-      (map-node-insert-helper!
+      (map-node-insert-helper-2!
         (:root @(:edges graph))
         nil
         hashed-edge-key
         (Edge. from to weight label)
-        Root
         true)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;; Queue Related Insertion ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -276,7 +284,7 @@
     (println "Color: Red"))
   (if (= @(:child @node) 2)
     (println "Child: Left")
-    (if (nil? @(:child @node))
+    (if (= @(:child @node) 8)
       (println "Child: Root")
       (println "Child: Right")))
   (println "======================="))
@@ -292,10 +300,48 @@
     (println "Color: Red"))
   (if (= @(:child @node) 2)
     (println "Child: Left")
-    (if (nil? @(:child @node))
+    (if (= @(:child @node) 8)
       (println "Child: Root")
       (println "Child: Right")))
   (println "======================="))
+
+(defn print-vertex-tree [node]
+  (when (not (node-empty? node))
+    (println "Hash Value: " @(:hashl @node))
+    (println "Label: " (:label @(:grecord @node)))
+    (println "Latitude: " (:latitude @(:grecord @node)))
+    (println "Longitude: " (:longitude @(:grecord @node)))
+    (println "Neighbors: " @(:neighbors @(:grecord @node)))
+    (if (= @(:color @node) 0)
+      (println "Color: Black")
+      (println "Color: Red"))
+    (if (= @(:child @node) 2)
+      (println "Child: Left")
+      (if (= @(:child @node) 8)
+        (println "Child: Root")
+        (println "Child: Right")))
+    (println "=======================")
+    (print-vertex-tree (:left @node))
+    (print-vertex-tree (:right @node))))
+
+(defn print-edge-tree [node]
+  (when (not (node-empty? node))
+    (println "Hash Value: " @(:hashl @node))
+    (println "Label: " (:label @(:grecord @node)))
+    (println "From: " (:from @(:grecord @node)))
+    (println "To: " (:to @(:grecord @node)))
+    (println "Wight: " (:weight @(:grecord @node)))
+    (if (= @(:color @node) 0)
+      (println "Color: Black")
+      (println "Color: Red"))
+    (if (= @(:child @node) 2)
+      (println "Child: Left")
+      (if (= @(:child @node) 8)
+        (println "Child: Root")
+        (println "Child: Right")))
+    (println "=======================")
+    (print-edge-tree (:left @node))
+    (print-edge-tree (:right @node))))
 
 (defn print-tree [node]
   (when (not (tree-node-empty? node))
