@@ -168,12 +168,12 @@
       false))
 
 (defn neighbor-set! [to from]
-  (let [to-neighbors @(:neighbors @(get-node (hash-label to) (:root @(:vertices g))))
-        from-neighbors @(:neighbors @(get-node (hash-label from) (:root @(:vertices g))))]
+  (let [to-neighbors @(:neighbors @(:grecord @(get-node (hash-label to) (:root @(:vertices g)))))
+        from-neighbors @(:neighbors @(:grecord @(get-node (hash-label from) (:root @(:vertices g)))))]
     (dosync
-      (ref-set (:neighbors @(get-node (hash-label to (:root @(:vertices g)))))
+      (ref-set (:neighbors @(:grecord @(get-node (hash-label to) (:root @(:vertices g)))))
         (conj to-neighbors from))
-      (ref-set (:neighbors @(get-node (hash-label from (:root @(:vertices g)))))
+      (ref-set (:neighbors @(:grecord @(get-node (hash-label from) (:root @(:vertices g)))))
         (conj from-neighbors to)))))
 
 (defn map-node-insert-helper! [node parent hashed-label grecord child is-edge?]
@@ -282,9 +282,13 @@
     (pop-least-node! (:left @node))
     (dosync
       (:label @node)
-      (ref-set
-        (:left @(:parent @node))
-        (make-nil-node Left)))))
+      (if (node-root? node)
+        (ref-set
+          node
+          (make-nil-node Root))
+        (ref-set
+          (:left @(:parent @node))
+          (make-nil-node Left))))))
 
 ;;;;;;;;;;;;;;;;;;;;;;; Debugging Queue and Graph ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
