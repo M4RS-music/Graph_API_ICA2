@@ -1,26 +1,26 @@
 ;;Uses hash on labels to allow node lookup via label.
 
-;;;;;;;;;;;;;;;;;;;;;;Record Structures for Red Black Queue;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;; Record Structures and Constants for Red Black Queue ;;;;;;;;;;;;;;
 
 ;;This is for the open queue in bfs.
 (defrecord Red-Black-Tree [root])
 (defrecord Red-Black-Node [label value color left right parent child])
-(defn make-nil-node [child] (Red-Black-Node. nil (ref nil) (ref Black) (ref nil) (ref nil) (ref nil) (ref child)))
-
-;;;;;;;;Record Structures and Constants for Vertices and Edges Tree's;;;;;;;;;;;
-
-;;Each node keeps track of its hash value, graph record structure, color, children, parent
-;;and of which child it is to its parent.
-(defrecord Red-Black-Tree-Map [root])
-(defrecord Red-Black-Map-Node [hashl grecord color left right parent child])
 (def ^:const Black 0)
 (def ^:const Red 1)
 (def ^:const Left 2)
 (def ^:const Right 3)
 (def ^:const Root 8)
+(defn make-nil-node [child] (Red-Black-Node. nil (ref nil) (ref Black) (ref nil) (ref nil) (ref nil) (ref child)))
+
+;;;;;;;;;;;;;;;; Record Structures for Vertices and Edges Tree's ;;;;;;;;;;;;;;;
+
+;;Each node keeps track of its hash value, graph record structure, color, children, parent
+;;and of which child it is to its parent.
+(defrecord Red-Black-Tree-Map [root])
+(defrecord Red-Black-Map-Node [hashl grecord color left right parent child])
 (defn make-nil-map-node [child] (Red-Black-Map-Node. (ref nil) (ref nil) (ref Black) (ref nil) (ref nil) (ref nil) (ref child)))
 
-;;;;;;;;;;;;;;;;;Record Structures and Constants for Graph;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;; Record Structures and Constants for Graph ;;;;;;;;;;;;;;;;;;;;;
 
 (defrecord Graph [vertices edges])
 (defrecord Edge [from to weight label])
@@ -31,13 +31,13 @@
 (def ^:const current 6)
 (def ^:const visited 7)
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;Creation Functions;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Creation Functions ;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defn hash-label [label] (.hashCode label))
 (defn make-red-black-tree-map! [] (Red-Black-Tree-Map. (ref (make-nil-map-node Root))))
 (defn make-red-black-tree! [] (Red-Black-Tree. (ref (make-nil-node Root))))
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;Creating Graph;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Creating Graph ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;Creating rb tree maps for the Graph.
 (def v-tree (ref (make-red-black-tree-map!)))
@@ -45,11 +45,11 @@
 (defn make-graph [] (Graph. v-tree e-tree))
 (def g (make-graph))
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;Creating Queue;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Creating Queue ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (def rb-queue (make-red-black-tree!))
 
-;;;;;;;;;;;;;Helper Functions For Insertions and Checking Rules ;;;;;;;;;;;;;;;;
+;;;;;;;;;;;; Helper Functions For Insertions and Checking Rules ;;;;;;;;;;;;;;;;
 
 (defn node-root? [node] (= @(:child node) Root))
 
@@ -59,13 +59,13 @@
 
 (defn red-black-tree-empty? [tree] (tree-node-empty? (:root tree)))
 
-(defn red-black-map-empty? [tree] (node-empty? (:root tree))))
+(defn red-black-map-empty? [tree] (node-empty? (:root tree)))
 
 (defn make-map-node! [hashed-label grecord color parent child]
   (Red-Black-Map-Node. (ref hashed-label) (ref grecord) (ref color) (ref (make-nil-map-node Left)) (ref (make-nil-map-node Right)) (ref parent) (ref child)))
 
 (defn make-node! [label value color parent child]
-  (Red-Black-Node. label (ref value) (ref color) (ref nil-leaf) (ref nil-leaf) (ref parent) (ref child)))
+  (Red-Black-Node. label (ref value) (ref color) (ref (make-nil-node Left)) (ref (make-nil-node Right)) (ref parent) (ref child)))
 
 (defn get-sibling [node]
   (if (= @(:child @node) Left)
@@ -97,9 +97,24 @@
         (ref-set (:color @grandparent) Red)))
       (red-black-rules-checker! grandparent)))
 
-(defn left-rotate! [node] nil)
+; (defn left-rotate! [node]
+;   (let [a node
+;         b (:right @node)
+;         c (:left @b)]
+;   (dosync
+;     (ref-set a @b)
+;     )))
 
-(defn right-rotate! [node] nil)
+; (defn right-rotate! [node]
+;   (let [b node
+;         a (:left @node)
+;         c (:right @a)]
+;   (dosync
+;     (ref-set b @a)
+;     )))
+
+(defn left-rotate! [node] (println "Left rotation needed"))
+(defn right-rotate! [node] (println "Right rotation needed"))
 
 (defn left-left-case! [grandparent]
   (right-rotate! grandparent)
@@ -139,7 +154,7 @@
         (red-parent-red-uncle-fix! node)
         (red-parent-black-uncle-checker! node)))))
 
-;;;;;;;;;;;;;;;;;;;Graph Related Node Insertion Helpers;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;; Graph Related Node Insertion Helpers ;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defn get-node [hashed-label node]
   (cond
@@ -255,7 +270,7 @@
       (= value @(:value @(:root tree)))
         (node-insert-helper! (:right @(:root tree)) (:root tree) label value Right))))
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;Queue Operations;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Queue Operations ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defn pick-least-node [node]
   (if (not (tree-node-empty? (:left @node)))
@@ -269,7 +284,7 @@
       (:label @node)
       (ref-set
         (:left @(:parent @node))
-        nil-leaf))))
+        (make-nil-node Left)))))
 
 ;;;;;;;;;;;;;;;;;;;;;;; Debugging Queue and Graph ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
