@@ -97,30 +97,75 @@
         (ref-set (:color @grandparent) Red)))
       (red-black-rules-checker! grandparent)))
 
- (defn left-rotate! [node]
-   (let [a node
-        b (:right @node)
-        c (:left @b)
-        av @a
-        bv @b
-        cv @c]
-   (dosync
-     (ref-set a @b)
-     )))
+ ; (defn left-rotate! [node]
+ ;   (let [a node
+ ;        b (:right @node)
+ ;        c (:left @b)
+ ;        av @a
+ ;        ac @(:child av)
+ ;        bv @b
+ ;        cv @c]
+ ;   (dosync
+ ;     (ref-set a @b)
+ ;     )))
+ ;
+ ; (defn right-rotate! [node]
+ ;   (let [b node
+ ;        a (:left @node)
+ ;        c (:right @a)
+ ;        av @a
+ ;        bv @b
+ ;        bc @(:child bv)
+ ;        cv @c]
+ ;   (dosync
+ ;     (ref-set b @a)
+ ;     )))
 
- (defn right-rotate! [node]
-   (let [b node
-        a (:left @node)
-        c (:right @a)
-        av @a
-        bv @b
-        cv @c]
+(defn rb-rotate-left [a LEFT RIGHT]
+ (let [b @(RIGHT a)
+       p (:parent a)
+       child @(:child a)]
    (dosync
-     (ref-set b @a)
-     )))
+    (ref-set (RIGHT a) @(LEFT b))
+    (ref-set (LEFT b) a)
+    (ref-set (:parent a) b)
+    (ref-set (:child a) Left)
+    (ref-set (:child b) child)
+    (when (not (nil? @(RIGHT a)))
+      (ref-set (:parent @(RIGHT a)) a)
+      (ref-set (:child @(RIGHT a)) Right))
+    (when (not (nil? p))
+      (if (= a @(LEFT p))
+        (ref-set (LEFT p) b)
+        (if (= a @(RIGHT p))
+          (ref-set (RIGHT p) b))))
+    (ref-set (:parent b) p))))
 
-(defn left-rotate! [node] (println "Left rotation needed"))
-(defn right-rotate! [node] (println "Right rotation needed"))
+(defn rb-rotate-right [a LEFT RIGHT]
+  (let [b @(RIGHT a)
+        p (:parent a)
+        child @(:child a)]
+    (dosync
+     (ref-set (RIGHT a) @(LEFT b))
+     (ref-set (LEFT b) a)
+     (ref-set (:parent a) b)
+     (ref-set (:child a) Right)
+     (ref-set (:child b) child)
+     (when (not (nil? @(RIGHT a)))
+       (ref-set (:parent @(RIGHT a)) a)
+       (ref-set (:child @(RIGHT a)) Left))
+     (when (not (nil? p))
+       (if (= a @(LEFT p))
+         (ref-set (LEFT p) b)
+         (if (= a @(RIGHT p))
+           (ref-set (RIGHT p) b))))
+     (ref-set (:parent b) p))))
+
+(defn left-rotate! [a]
+ (rb-rotate-left @a :left :right))
+
+(defn right-rotate! [a]
+ (rb-rotate-right @a :right :left))
 
 (defn left-left-case! [grandparent]
   (right-rotate! grandparent)
