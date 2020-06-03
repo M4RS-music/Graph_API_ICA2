@@ -281,11 +281,15 @@
   (if (not (tree-node-empty? (:left @node)))
     (pop-least-node! (:left @node))
     (dosync
-      (:label @node)
-      (if (node-root? node)
-        (ref-set
-          node
-          (make-nil-node Root))
+      node
+      (if (node-root? @node)
+        (if (tree-node-empty? (:right @node))
+          (ref-set
+            node
+            (make-nil-node Root))
+          (ref-set
+            node
+            @(:right @node)))
         (ref-set
           (:left @(:parent @node))
           (make-nil-node Left))))))
@@ -326,7 +330,33 @@
 
 (defn get-edge [graph from to]
   (:grecord @(get-node (hash-label (edge-key from to)) (:root @(:edges graph)))))
+
+(defn get-vertex-unseen? [graph label]
+  (= @(:status (get-vertex graph label)) unseen))
 ;;;;Get;;;;
+
+;;;;BFS;;;;
+(defn breadth-first-search-dijkstra [graph start finish]
+  (node-insert! rb-queue finish 0)
+  (loop []
+    (when (not (red-black-tree-empty? rb-queue))
+    (let [current (pop-least-node! (:root rb-queue))]
+      (dosync
+        (ref-set (:distance @(get-vertex graph (:label @current)))
+                  @(:value @current)))
+      (when (not (= (:label @current) start))
+        (loop [neighbors
+              @(:neighbors @(get-node (hash-label (:label @current)) (:root @(:vertices graph))))]
+          (let [current-neighbor (first neighbors)]
+            (when (get-vertex-unseen? graph current-neighbor)
+              (node-insert! rb-queue current-neighbor (inc @(:value @current)))))
+          (recur (rest neighbors)))))
+    (recur))))
+;;;;BFS;;;;
+
+;;;;Dijksta Without Edge Weights;;;;
+
+;;;;Dijksta Without Edge Weights;;;;
 
 ;;;;;;;;;;;;;;;;;;;;;;; Debugging Queue and Graph ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
