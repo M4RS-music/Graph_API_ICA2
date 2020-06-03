@@ -107,7 +107,7 @@ ICA2
 \end_layout
 
 \begin_layout Paragraph*
-1112 Words
+2243 Words
 \end_layout
 
 \begin_layout Paragraph*
@@ -232,13 +232,13 @@ The aim of the assignment was to describe the implementation of the algorithms
 \end_layout
 
 \begin_layout Section
-Prerequisite Structures and Functions
+Prerequisite Structures
 \end_layout
 
 \begin_layout Paragraph*
-The following are descriptions of major structures and functions that were
- implemented in order to create an efficient interface between the implemented
- algorithms and the data supplied by the assignment.
+The following are descriptions of major structures that were implemented
+ in order to create an efficient interface between the implemented algorithms
+ and the data supplied by the assignment.
 \end_layout
 
 \begin_layout Section
