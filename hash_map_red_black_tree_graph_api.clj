@@ -233,9 +233,9 @@
       (dosync
         (ref-set node
           (make-map-node! hashed-label grecord Red @parent child)))
-      (red-black-rules-checker! node)
       (when is-edge?
-        (neighbor-set! (:to @(:grecord @node)) (:from @(:grecord @node)))))
+        (neighbor-set! (:to @(:grecord @node)) (:from @(:grecord @node))))
+      (red-black-rules-checker! node))
     (cond
       (< hashed-label @(:hashl @node))
         (map-node-insert-helper! (:left @node) node hashed-label grecord Left is-edge?)
