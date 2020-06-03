@@ -1,0 +1,664 @@
+#LyX 2.3 created this file. For more info see http://www.lyx.org/
+\lyxformat 544
+\begin_document
+\begin_header
+\save_transient_properties true
+\origin unavailable
+\textclass article
+\use_default_options true
+\maintain_unincluded_children false
+\language english
+\language_package default
+\inputencoding auto
+\fontencoding global
+\font_roman "times" "default"
+\font_sans "default" "default"
+\font_typewriter "courier" "default"
+\font_math "newtxmath" "auto"
+\font_default_family rmdefault
+\use_non_tex_fonts false
+\font_sc false
+\font_osf false
+\font_sf_scale 100 100
+\font_tt_scale 100 100
+\use_microtype true
+\use_dash_ligatures true
+\graphics default
+\default_output_format default
+\output_sync 0
+\bibtex_command default
+\index_command default
+\float_placement H
+\paperfontsize 10
+\spacing single
+\use_hyperref false
+\papersize default
+\use_geometry false
+\use_package amsmath 1
+\use_package amssymb 1
+\use_package cancel 1
+\use_package esint 1
+\use_package mathdots 1
+\use_package mathtools 1
+\use_package mhchem 1
+\use_package stackrel 1
+\use_package stmaryrd 1
+\use_package undertilde 1
+\cite_engine basic
+\cite_engine_type default
+\biblio_style plain
+\use_bibtopic false
+\use_indices false
+\paperorientation portrait
+\suppress_date false
+\justification true
+\use_refstyle 1
+\use_minted 0
+\index Index
+\shortcut idx
+\color #008000
+\end_index
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation indent
+\paragraph_indentation default
+\is_math_indent 0
+\math_numbering_side default
+\quotes_style english
+\dynamic_quotes 0
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+\tracking_changes false
+\output_changes false
+\html_math_output 0
+\html_css_as_file 0
+\html_be_strict false
+\end_header
+
+\begin_body
+
+\begin_layout Title
+Algorithms For Graph Structures
+\end_layout
+
+\begin_layout Author
+Martin Janda
+\end_layout
+
+\begin_layout Paragraph*
+Prague College
+\end_layout
+
+\begin_layout Paragraph*
+Algorithms and Data Structures (FT)
+\end_layout
+
+\begin_layout Paragraph*
+Dominik Pantůček
+\end_layout
+
+\begin_layout Paragraph*
+Shortest Route(s)
+\end_layout
+
+\begin_layout Paragraph*
+ICA2
+\end_layout
+
+\begin_layout Paragraph*
+2243 Words
+\end_layout
+
+\begin_layout Paragraph*
+Semester 2001
+\end_layout
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+thispagestyle{empty}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Newpage newpage
+\end_inset
+
+
+\begin_inset CommandInset toc
+LatexCommand tableofcontents
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset FloatList figure
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+thispagestyle{empty}
+\end_layout
+
+\end_inset
+
+
+\begin_inset Newpage newpage
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+setcounter{page}{1}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Scenario
+\end_layout
+
+\begin_layout Paragraph*
+The assignment provides a set of vertices (cities or road crossings in the
+ E.U.) and a set of edges (major E.U.
+ roads) as commands meant to be passed to an application program interface
+ designed by the student.
+ The student was given two cities and asked to code an algorithm in Clojure
+ that was capable of finding the shortest path (or proving one does not
+ exist) between each city and Prague.
+ The student was given 
+\begin_inset Quotes eld
+\end_inset
+
+Nuremberg
+\begin_inset Quotes erd
+\end_inset
+
+ and 
+\begin_inset Quotes eld
+\end_inset
+
+Palmero
+\begin_inset Quotes erd
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Section
+Aim
+\end_layout
+
+\begin_layout Paragraph*
+The aim of the assignment was to describe the implementation of the algorithms
+ specified by the assignment brief.
+ This technical report also adresses the graph and helper structures that
+ have been implemented as they are a large part of the code being submitted.
+ All code in this doccument was written by the author in Clojure a list
+ proccessing programming language.
+\end_layout
+
+\begin_layout Section
+Prerequisite Structures
+\end_layout
+
+\begin_layout Paragraph*
+The following are descriptions of major structures that were implemented
+ in order to create an efficient interface between the implemented algorithms
+ and the data supplied by the assignment.
+\end_layout
+
+\begin_layout Section
+Dijkstra's Algorithm Without Edge Weights
+\end_layout
+
+\begin_layout Paragraph*
+This section describes the implementation of Dijkstra's algorithm, Dijkstra's
+ algorithm finds the shortest path between two vertices in a graph.
+ In this section only the implementation that does not take into account
+ edge weights is discussed.
+\end_layout
+
+\begin_layout Subsection
+Dijksta Function
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+lstparams "language=Lisp,numbers=left,basicstyle={\ttfamily},tabsize=3"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+lorem ipsum
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+Flowchart for 
+\begin_inset Quotes eld
+\end_inset
+
+dijkstra!
+\begin_inset Quotes erd
+\end_inset
+
+ Function
+\end_layout
+
+\end_inset
+
+
+\begin_inset Graphics
+	filename /Users/martinjanda/Desktop/Screen Shot 2020-06-03 at 7.17.54 PM.png
+	scale 70
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Paragraph*
+The above function serves only to call all the helper functions associated
+ with finding the shortest path between two vertices following Dijkstra's
+ algorithm.
+ First the function runs the graph reset.
+ This is a simple recursive function that iterates through all the vertices
+ of the graph and sets their status to unseen and distance to finish to
+ infinity.
+ The time complexity of this operation is tightly bound and linear O(n)=
+ Ω(n)=Θ(n) as it must iterate through each and every node of the red-black
+ tree of vertices.
+ The memory complexity of this varys throughout each iteration of the algorithm
+ and is roughly equal to the width of the tree at the depth of the corresponding
+ iteration this means it is tightly bound O(2
+\begin_inset script superscript
+
+\begin_layout Plain Layout
+i
+\end_layout
+
+\end_inset
+
+)= Ω(2
+\begin_inset script superscript
+
+\begin_layout Plain Layout
+i
+\end_layout
+
+\end_inset
+
+)=Θ(2
+\begin_inset script superscript
+
+\begin_layout Plain Layout
+i
+\end_layout
+
+\end_inset
+
+), where 
+\begin_inset Quotes eld
+\end_inset
+
+i
+\begin_inset Quotes erd
+\end_inset
+
+ is the index of the iteration starting at 0.
+ This is however a rough estimate and may vary for leaf nodes as red-black
+ trees stay within a 1 node difference in maximum and minimum depth.
+\end_layout
+
+\begin_layout Paragraph*
+Next the function checks if the start and finish vertices are part of the
+ same connected component.
+ If they are, the function continues otherwise the function terminates without
+ entering the marking phase as there exists no path between two nodes that
+ are not part of the same connected component.
+ The time complexity of this operation is O(log n) or Ω(1) and is not tightly
+ bound because all that is happening is the lookup of two nodes within the
+ graph's red-black tree structure which contains the set of vertices.
+ The memory complexity is tightly bound and constant O(1)= Ω(1)=Θ(1) as
+ only one node is being accessed at a time while searching for the specified
+ node.
+\end_layout
+
+\begin_layout Paragraph*
+If the condition is satisfied the function will call the marking stage which
+ is a modified breadth first search.
+ Once the marking stage completes the function runs the trace back algorithm
+ and terminates.
+ The functions/algorithms mentioned in this paragraph will be further stated
+ and analyzed in the following subsections.
+\end_layout
+
+\begin_layout Subsection
+Breadth First Search Algorithm
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+lstparams "language=Lisp,numbers=left,basicstyle={\ttfamily},tabsize=3"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+(defn breadth-first-search-dijkstra [graph start finish]
+\end_layout
+
+\begin_layout Plain Layout
+
+  (node-insert! rb-queue finish 0)
+\end_layout
+
+\begin_layout Plain Layout
+
+  (loop []
+\end_layout
+
+\begin_layout Plain Layout
+
+    (when (not (red-black-tree-empty? rb-queue))
+\end_layout
+
+\begin_layout Plain Layout
+
+    (let [current (pop-least-node! (:root rb-queue))]
+\end_layout
+
+\begin_layout Plain Layout
+
+      (dosync
+\end_layout
+
+\begin_layout Plain Layout
+
+        (ref-set (:distance @(get-vertex graph (:label @current)))
+\end_layout
+
+\begin_layout Plain Layout
+
+                  @(:value @current)))
+\end_layout
+
+\begin_layout Plain Layout
+
+      (when (not (= (:label @current) start))
+\end_layout
+
+\begin_layout Plain Layout
+
+        (loop [neighbors
+\end_layout
+
+\begin_layout Plain Layout
+
+              @(:neighbors @(get-node (hash-label (:label @current)) (:root
+ @(:vertices graph))))]
+\end_layout
+
+\begin_layout Plain Layout
+
+          (let [current-neighbor (first neighbors)]
+\end_layout
+
+\begin_layout Plain Layout
+
+            (when (get-vertex-unseen? graph current-neighbor)
+\end_layout
+
+\begin_layout Plain Layout
+
+              (node-insert! rb-queue current-neighbor (inc @(:value @current))))
+)
+\end_layout
+
+\begin_layout Plain Layout
+
+          (recur (rest neighbors)))))
+\end_layout
+
+\begin_layout Plain Layout
+
+    (recur))))
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Paragraph*
+The algorithm above accepts three arguments one pointing to a graph within
+ which are two nodes (start, finish) that are the remaining arguments.
+ The algorithm finds the shortest path between these two nodes by running
+ a breadth first search from the finish node searching for the start node.
+ Breadth first search keeps track of an, 
+\begin_inset Quotes eld
+\end_inset
+
+open queue
+\begin_inset Quotes erd
+\end_inset
+
+ which is a set of vertices that are going to be processed, a set of visited
+ or already proccessed vertices and a current vertex.
+ The breadth first search is given the finish node which it adds to the
+ open queue.
+ If the open queue is still populated the algorithm removes next vertex
+ from open queue and sets it as current vertex.
+ The current vertex's distance value (in its record structure) is set to
+ its distance from the finish node.
+ In this case the distance is the amount of hops (edges) the node is away
+ from the finish.
+ Finally all adjacent verticies of the current vertex that have an 
+\begin_inset Quotes eld
+\end_inset
+
+unseen status
+\begin_inset Quotes erd
+\end_inset
+
+ (in ther record structure) are added to the open queue and the current
+ vertex's status is set visited.
+ The algorithm then choses its next vertex from the open queue and repeats
+ the afformentioned steps untill it reaches the start node.
+ It is at this point that the algorithm would normally evaluate whether
+ or not a path exists between the two nodes however in this implementation
+ each vertex has already been marked with an index number corresponding
+ to its connected component.
+ The algorithm first checks if the two nodes have equal values in the 
+\begin_inset Quotes eld
+\end_inset
+
+component
+\begin_inset Quotes erd
+\end_inset
+
+ sections of their records.
+ If the indicies do not match there exists no path between the two nodes
+ and the breadth first search will not run.
+ If this feature was not implemented the algorithm would have the itterate
+ through the entire connected component before it could assume that there
+ exists no path between the two given nodes.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+Flowchart for 
+\begin_inset Quotes eld
+\end_inset
+
+breadth-first-search!
+\begin_inset Quotes erd
+\end_inset
+
+ Function
+\end_layout
+
+\end_inset
+
+
+\begin_inset Graphics
+	filename /Users/martinjanda/Documents/bfs_flowchart.png
+	scale 70
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Trace Back Function for Dijkstra's Algorithm
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+lstparams "language=Lisp,numbers=left,basicstyle={\ttfamily},tabsize=3"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+lorem ipsum
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+Flowchart for 
+\begin_inset Quotes eld
+\end_inset
+
+dijksta-trace-back
+\begin_inset Quotes erd
+\end_inset
+
+ Function
+\end_layout
+
+\end_inset
+
+
+\begin_inset Graphics
+	filename /Users/martinjanda/Desktop/Screen Shot 2020-06-03 at 7.30.11 PM.png
+	scale 75
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Paragraph*
+The above algorithm is used after the marking phase of any Dijkstra's algorithm
+ (with or without weights).
+ The tracing back begins by setting the start vertex to be the current vertex.
+ Next the algorithm prints the label of the current vertex.
+ If the label of the current vertex is not equal to the finish argument
+ the algorithm chooses the neighbor of the current vertex with the lowest
+ distance value in its record and sets it to the new current vertex.
+ After this the algorithm recurs back to the step where it prints the label
+ and repeats stated steps until it reaches the finish.
+ At this point Dijkstra's algorithm has finished and the shortest path between
+ the start and finish vertices has been printed.
+\end_layout
+
+\end_body
+\end_document
