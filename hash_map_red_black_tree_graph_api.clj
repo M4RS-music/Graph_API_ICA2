@@ -97,21 +97,27 @@
         (ref-set (:color @grandparent) Red)))
       (red-black-rules-checker! grandparent)))
 
-; (defn left-rotate! [node]
-;   (let [a node
-;         b (:right @node)
-;         c (:left @b)]
-;   (dosync
-;     (ref-set a @b)
-;     )))
+ (defn left-rotate! [node]
+   (let [a node
+        b (:right @node)
+        c (:left @b)
+        av @a
+        bv @b
+        cv @c]
+   (dosync
+     (ref-set a @b)
+     )))
 
-; (defn right-rotate! [node]
-;   (let [b node
-;         a (:left @node)
-;         c (:right @a)]
-;   (dosync
-;     (ref-set b @a)
-;     )))
+ (defn right-rotate! [node]
+   (let [b node
+        a (:left @node)
+        c (:right @a)
+        av @a
+        bv @b
+        cv @c]
+   (dosync
+     (ref-set b @a)
+     )))
 
 (defn left-rotate! [node] (println "Left rotation needed"))
 (defn right-rotate! [node] (println "Right rotation needed"))
