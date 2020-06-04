@@ -107,7 +107,7 @@ ICA2
 \end_layout
 
 \begin_layout Paragraph*
-1112 Words
+1971 Words
 \end_layout
 
 \begin_layout Paragraph*
@@ -266,6 +266,10 @@ The main data structure used in this implementation is a red-black tree.
  is used for the vertices and edges.
 \end_layout
 
+\begin_layout Paragraph*
+lyx is shit
+\end_layout
+
 \begin_layout Standard
 \begin_inset listings
 lstparams "language=Lisp,numbers=left,basicstyle={\ttfamily},tabsize=3"
@@ -375,6 +379,10 @@ grecord
  The vertex and edge trees are sorted based on the hashed labels.
 \end_layout
 
+\begin_layout Paragraph*
+lyx is shit
+\end_layout
+
 \begin_layout Standard
 \begin_inset listings
 lstparams "language=Lisp,numbers=left,basicstyle={\ttfamily},tabsize=3"
@@ -414,6 +422,10 @@ Graph.
 
  record.
  The following code defines the graph's record structure.
+\end_layout
+
+\begin_layout Paragraph*
+lyx is shit
 \end_layout
 
 \begin_layout Standard
@@ -568,6 +580,10 @@ component
  stores the indicie of the connected component to which the vertex belongs.
 \end_layout
 
+\begin_layout Paragraph*
+lyx is shit
+\end_layout
+
 \begin_layout Standard
 \begin_inset listings
 lstparams "language=Lisp,numbers=left,basicstyle={\ttfamily},tabsize=3"
@@ -602,6 +618,10 @@ Adding Data
 \begin_layout Paragraph*
 The assignment supplied a list of statements that were meant to use the
  following functions:
+\end_layout
+
+\begin_layout Paragraph*
+lyx is shit
 \end_layout
 
 \begin_layout Standard
@@ -1011,8 +1031,8 @@ dijksta-trace-back
 \end_layout
 
 \begin_layout Paragraph*
-The above algorithm is used after the marking phase of any Dijkstra's algorithm
- (with or without weights).
+The above algorithm is used after the marking phase of Dijkstra's algorithm
+ without edge weights.
  The tracing back begins by setting the start vertex to be the current vertex.
  Next the algorithm prints the label of the current vertex.
  If the label of the current vertex is not equal to the finish argument
@@ -1115,9 +1135,9 @@ status open
 \end_layout
 
 \begin_layout Paragraph*
-Chosing the neighbor with the lowest distance to finish is as simple as
- iterating through all the neighbors and keeping track of the lowest distance
- value over iterations.
+Chosing the neighbor with the lowest distance to finish (without edge weights)
+ is as simple as iterating through all the neighbors and keeping track of
+ the lowest distance value over iterations.
  The above function acomplishes exactly that and returns the label of the
  neighbor with the lowest distance to finish.
  The time complexity of this function is tightly bound and linear O(n)=
@@ -1132,8 +1152,9 @@ n
  is the number of neighbors of the vertex.
  This is because the distance each neighbor must be checked once to find
  the neighbor with the lowest value.
- The memory complexity of this function is tightly bound and linear O(n)=
- Ω(n)=Θ(n) as all of the nei
+ The memory complexity of this function is not tightly bound O(n) Ω(1) as
+ all of the neighbors must be stored in the loop at the beggining and one
+ less is kept track off on each iteration.
 \end_layout
 
 \begin_layout Subsection

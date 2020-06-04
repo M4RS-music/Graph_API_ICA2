@@ -107,7 +107,7 @@ ICA2
 \end_layout
 
 \begin_layout Paragraph*
-1112 Words
+1971 Words
 \end_layout
 
 \begin_layout Paragraph*
@@ -266,6 +266,10 @@ The main data structure used in this implementation is a red-black tree.
  is used for the vertices and edges.
 \end_layout
 
+\begin_layout Paragraph*
+lyx is shit
+\end_layout
+
 \begin_layout Standard
 \begin_inset listings
 lstparams "language=Lisp,numbers=left,basicstyle={\ttfamily},tabsize=3"
@@ -375,6 +379,10 @@ grecord
  The vertex and edge trees are sorted based on the hashed labels.
 \end_layout
 
+\begin_layout Paragraph*
+lyx is shit
+\end_layout
+
 \begin_layout Standard
 \begin_inset listings
 lstparams "language=Lisp,numbers=left,basicstyle={\ttfamily},tabsize=3"
@@ -414,6 +422,10 @@ Graph.
 
  record.
  The following code defines the graph's record structure.
+\end_layout
+
+\begin_layout Paragraph*
+lyx is shit
 \end_layout
 
 \begin_layout Standard
@@ -568,6 +580,10 @@ component
  stores the indicie of the connected component to which the vertex belongs.
 \end_layout
 
+\begin_layout Paragraph*
+lyx is shit
+\end_layout
+
 \begin_layout Standard
 \begin_inset listings
 lstparams "language=Lisp,numbers=left,basicstyle={\ttfamily},tabsize=3"
@@ -602,6 +618,10 @@ Adding Data
 \begin_layout Paragraph*
 The assignment supplied a list of statements that were meant to use the
  following functions:
+\end_layout
+
+\begin_layout Paragraph*
+lyx is shit
 \end_layout
 
 \begin_layout Standard
@@ -1011,8 +1031,8 @@ dijksta-trace-back
 \end_layout
 
 \begin_layout Paragraph*
-The above algorithm is used after the marking phase of any Dijkstra's algorithm
- (with or without weights).
+The above algorithm is used after the marking phase of Dijkstra's algorithm
+ without edge weights.
  The tracing back begins by setting the start vertex to be the current vertex.
  Next the algorithm prints the label of the current vertex.
  If the label of the current vertex is not equal to the finish argument
@@ -1036,12 +1056,12 @@ status open
 
 \begin_layout Plain Layout
 
-(defn dijkstra-trace-back-pick-best [vertex]
+(defn dijkstra-trace-back-pick-best [graph vertex]
 \end_layout
 
 \begin_layout Plain Layout
 
-  (loop [neighbors @(:neighbors @(get-vertex graph (:label current)))
+  (loop [neighbors @(:neighbors @(get-vertex graph vertex))
 \end_layout
 
 \begin_layout Plain Layout
@@ -1115,9 +1135,9 @@ status open
 \end_layout
 
 \begin_layout Paragraph*
-Chosing the neighbor with the lowest distance to finish is as simple as
- iterating through all the neighbors and keeping track of the lowest distance
- value over iterations.
+Chosing the neighbor with the lowest distance to finish (without edge weights)
+ is as simple as iterating through all the neighbors and keeping track of
+ the lowest distance value over iterations.
  The above function acomplishes exactly that and returns the label of the
  neighbor with the lowest distance to finish.
  The time complexity of this function is tightly bound and linear O(n)=
@@ -1280,7 +1300,7 @@ i
 
  is the index of the iteration starting at 0.
  This is however a rough estimate and may vary for leaf nodes as red-black
- trees stay within a 1 node difference in maximum and minimum depth.
+ trees stay within 1 node difference of maximum and minimum depth.
 \end_layout
 
 \begin_layout Paragraph*
@@ -1302,8 +1322,7 @@ If the condition is satisfied the function will call the marking stage which
  is a modified breadth first search.
  Once the marking stage completes the function runs the trace back algorithm
  and terminates.
- The functions/algorithms mentioned in this paragraph will be further stated
- and analyzed in the following subsections.
+ 
 \end_layout
 
 \end_body

@@ -331,7 +331,7 @@
             (:left @(:parent @node))
             (make-nil-node Left))))))
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;; Breadth First Search ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;Dijkstra Breadth First Search ;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;;;Reseting the distance and status of every vertex;;;
 (defn graph-reset-helper! [node]
@@ -372,8 +372,8 @@
   (= @(:status @(get-vertex graph label)) unseen))
 ;;;;Get;;;;
 
-;;;;BFS D;;;;
-(defn breadth-first-search-dijkstra [graph start finish]
+;;;;BFS Dijkstra;;;;
+(defn breadth-first-search-dijkstra! [graph start finish]
   (node-insert! rb-queue finish 0)
   (loop []
     (when (not (red-black-tree-empty? rb-queue))
@@ -390,11 +390,11 @@
               (node-insert! rb-queue current-neighbor (inc @(:value @current)))))
           (recur (rest neighbors)))))
     (recur))))
-;;;;BFS D;;;;
+;;;;BFS Dijkstra;;;;
 
 ;;;;Dijksta Without Edge Weights;;;;
-(defn dijkstra-trace-back-pick-best [vertex]
-  (loop [neighbors @(:neighbors @(get-vertex graph (:label current)))
+(defn dijkstra-trace-back-pick-best [graph vertex]
+  (loop [neighbors @(:neighbors @(get-vertex graph vertex))
          best-distance ##Inf
          best-label nil]
     (if (= (count neighbors) 1)
@@ -408,7 +408,6 @@
         (recur (rest neighbors)
                 best-distance
                 best-label)))))
-
 
 (defn dijkstra-trace-back [graph start finish]
   (loop [current start]
@@ -425,6 +424,75 @@
       (dijkstra-trace-back graph start finish))
     (println "No path exists!")))
 ;;;;Dijksta Without Edge Weights;;;;
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;Dijkstra Breadth First Search ;;;;;;;;;;;;;;;;;;;;;;;
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;A* Algorithm ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;;;;;;;;;;;;;;;;;;;Weights Pick Best Neigbor::::::::::::::::::::::::::::::::::::
+(defn weighted-trace-back-pick-best [graph vertex]
+  (loop [neighbors @(:neighbors @(get-vertex graph vertex))
+         best-distance ##Inf
+         best-label nil]
+    (if (= (count neighbors) 1)
+      (if (and
+            (< @(:distance @(get-vertex graph (first neighbors))) best-distance)
+            (= (- @(:distance @(get-vertex graph vertex))
+                  @(:distance @(get-vertex graph (first neighbors))))
+              (:weight @(get-edge graph (first neighbors) vertex))))
+        (first neighbors)
+        best-label)
+      (if (and
+            (< @(:distance @(get-vertex graph (first neighbors))) best-distance)
+            (= (- @(:distance @(get-vertex graph vertex))
+                  @(:distance @(get-vertex graph (first neighbors))))
+              (:weight @(get-edge graph (first neighbors) vertex))))
+        (recur (rest neighbors)
+               @(:distance @(get-vertex graph (first neighbors)))
+               (first neighbors))
+        (recur (rest neighbors)
+                best-distance
+                best-label)))))
+
+(defn weighted-trace-back [graph start finish]
+  (loop [current start]
+    (println current)
+    (when (not (= current finish))
+      (recur (weighted-trace-back-pick-best current)))))
+;;;;;;;;;;;;;;;;;;;Weights Pick Best Neigbor::::::::::::::::::::::::::::::::::::
+
+;;;;;;;BFS A*;;;;;;;
+(defn breadth-first-search-a*! [graph start finish]
+  (node-insert! rb-queue finish 0)
+  (loop []
+    (when (not (red-black-tree-empty? rb-queue))
+    (let [current (pick-least-node (:root rb-queue))]
+      (remove-least-node! (:root rb-queue))
+      (dosync
+        (ref-set (:distance @(get-vertex graph (:label current)))
+                  @(:value current)))
+      (when (not (= (:label current) start))
+        (loop [neighbors
+              @(:neighbors @(get-vertex graph (:label current)))]
+          (let [current-neighbor (first neighbors)]
+            (when (get-vertex-unseen? graph current-neighbor)
+              (node-insert! rb-queue current-neighbor (inc @(:value @current)))))
+          (recur (rest neighbors)))))
+    (recur))))
+;;;;;;;BFS A*;;;;;;;
+
+;;;;;;;;A*;;;;;;;;;;;
+(defn a*! [graph start finish]
+  (graph-reset! graph)
+  (if (= @(:component @(get-vertex graph start))
+         @(:component @(get-vertex graph finish)))
+    (do
+      (breadth-first-search-a*! graph start finish)
+      (weighted-trace-back graph start finish))
+    (println "No path exists!")))
+;;;;;;;;A*;;;;;;;;;;;
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;A* Algorithm ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;;;;;;;;;;;;;;;;;;;;;; Debugging Queue and Graph ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
