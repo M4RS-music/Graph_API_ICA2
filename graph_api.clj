@@ -323,13 +323,13 @@
               @(:right @node))
             (ref-set
               (:child @(:root rb-queue))
-              Right))
+              Right)
             (ref-set
               (:parent @(:root rb-queue))
               nil)))
-        (ref-set
-          (:left @(:parent @node))
-          (make-nil-node Left))))))
+          (ref-set
+            (:left @(:parent @node))
+            (make-nil-node Left))))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;; Breadth First Search ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
