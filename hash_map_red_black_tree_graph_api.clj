@@ -122,6 +122,7 @@
  ;     )))
 
 (defn rb-rotate-left [a LEFT RIGHT]
+<<<<<<< Updated upstream
  (let [b @(RIGHT a)
        p (:parent a)
        child @(:child a)]
@@ -140,6 +141,27 @@
         (if (= a @(RIGHT p))
           (ref-set (RIGHT p) b))))
     (ref-set (:parent b) p))))
+=======
+  (println "rb-rotate-left")
+  (let [b @(RIGHT a)
+        p @(:parent a)
+        child @(:child a)]
+    (dosync
+      (ref-set (RIGHT a) @(LEFT b))
+      (ref-set (LEFT b) a)
+      (ref-set (:parent a) b)
+      (ref-set (:child a) Left)
+      (ref-set (:child b) child)
+      (when (not (nil? @(RIGHT a)))
+        (ref-set (:parent @(RIGHT a)) a)
+        (ref-set (:child @(RIGHT a)) Right))
+      (when (not (nil? p))
+        (if (= a @(LEFT p))
+          (ref-set (LEFT p) b)
+          (if (= a @(RIGHT p))
+            (ref-set (RIGHT p) b))))
+      (ref-set (:parent b) p))))
+>>>>>>> Stashed changes
 
 (defn rb-rotate-right [a LEFT RIGHT]
   (let [b @(RIGHT a)
@@ -162,10 +184,12 @@
      (ref-set (:parent b) p))))
 
 (defn left-rotate! [a]
- (rb-rotate-left @a :left :right))
+  (println "left-rotate!")
+  (rb-rotate-left @a :left :right))
 
 (defn right-rotate! [a]
- (rb-rotate-right @a :right :left))
+  (println "right-rotate")
+  (rb-rotate-right @a :right :left))
 
 (defn left-left-case! [grandparent]
   (right-rotate! grandparent)
@@ -336,11 +360,18 @@
       (if (node-root? @node)
         (if (tree-node-empty? (:right @node))
           (ref-set
-            node
+            (:root rb-queue)
             (make-nil-node Root))
-          (ref-set
-            node
-            @(:right @node)))
+          (do
+            (ref-set
+              (:root rb-queue)
+              @(:right @node))
+            (ref-set
+              (:child @(:root rb-queue))
+              Right))
+            (ref-set
+              (:parent @(:root rb-queue))
+              nil)))
         (ref-set
           (:left @(:parent @node))
           (make-nil-node Left))))))
@@ -383,7 +414,7 @@
   (:grecord @(get-node (hash-label (edge-key from to)) (:root @(:edges graph)))))
 
 (defn get-vertex-unseen? [graph label]
-  (= @(:status (get-vertex graph label)) unseen))
+  (= @(:status @(get-vertex graph label)) unseen))
 ;;;;Get;;;;
 
 ;;;;BFS;;;;
@@ -391,7 +422,12 @@
   (node-insert! rb-queue finish 0)
   (loop []
     (when (not (red-black-tree-empty? rb-queue))
+<<<<<<< Updated upstream
     (let [current (pop-least-node! (:root rb-queue))]
+=======
+    (let [current (pick-least-node (:root rb-queue))]
+      (remove-least-node! (:root rb-queue))
+>>>>>>> Stashed changes
       (dosync
         (ref-set (:distance @(get-vertex graph (:label @current)))
                   @(:value @current)))
@@ -496,3 +532,7 @@
     (println "=======================")
     (print-tree (:left @node))
     (print-tree (:right @node))))
+
+(defn print-vertices [] (print-vertex-tree (:root @(:vertices g))))
+(defn print-edges [] (print-edge-tree (:root @(:edges g))))
+(defn print-queue [] (print-tree (:root rb-queue)))
