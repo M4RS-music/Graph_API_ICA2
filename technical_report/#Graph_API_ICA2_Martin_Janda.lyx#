@@ -246,7 +246,10 @@ Structuring Data
 \end_layout
 
 \begin_layout Paragraph*
-Graphs can be represented in many ways
+Graphs can be represented in many ways in this implementation the author
+ has choses to use red-black trees with hash lookup to store a set of vertices
+ and a set of edges.
+ It is these two trees that 
 \end_layout
 
 \begin_layout Subsection
