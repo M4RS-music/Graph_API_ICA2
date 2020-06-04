@@ -242,14 +242,357 @@ The following are descriptions of major structures and functions that were
 \end_layout
 
 \begin_layout Subsection
-Structuring Data
+Data Structures
 \end_layout
 
 \begin_layout Paragraph*
-Graphs can be represented in many ways in this implementation the author
- has choses to use red-black trees with hash lookup to store a set of vertices
+This subsection addresses the underlying record structure of the implementation.
+ Words on the efficiency of and justifications for these structures will
+ be in subsection X.X.
+\end_layout
+
+\begin_layout Subsubsection
+Red-Black Trees
+\end_layout
+
+\begin_layout Paragraph*
+The main data structure used in this implementation is a red-black tree.
+ A red-black tree is a self balancing form of a binary search tree.
+ Red-black trees are responsible for storing the vertices, edges and open-queue
+ (for breadth first search) in this implementation.
+ The red-black tree is is defined by the following code, a reference to
+ the root node of the tree.
+ The record on line one is for the open queue and the record on line two
+ is used for the vertices and edges.
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+lstparams "language=Lisp,numbers=left,basicstyle={\ttfamily},tabsize=3"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+(defrecord Red-Black-Tree [root])
+\end_layout
+
+\begin_layout Plain Layout
+
+(defrecord Red-Black-Tree-Map [root])
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Paragraph*
+The root of the tree is a reference to a node.
+ Tree nodes are defined by the code below.
+ The two lines correspond to the open-queue, vertices and edges as with
+ the red-black tree definitions.
+ Both types of node keep track of the following
+\end_layout
+
+\begin_layout Itemize
+\begin_inset Quotes eld
+\end_inset
+
+color
+\begin_inset Quotes erd
+\end_inset
+
+: reference to the color of the node, either red or black, used to keep
+ the tree balanced by related functions.
+\end_layout
+
+\begin_layout Itemize
+\begin_inset Quotes eld
+\end_inset
+
+left
+\begin_inset Quotes erd
+\end_inset
+
+: reference to the node that is to the left of the node.
+\end_layout
+
+\begin_layout Itemize
+\begin_inset Quotes eld
+\end_inset
+
+right
+\begin_inset Quotes erd
+\end_inset
+
+: reference to the node that is to the right of the node.
+\end_layout
+
+\begin_layout Itemize
+\begin_inset Quotes eld
+\end_inset
+
+parent
+\begin_inset Quotes erd
+\end_inset
+
+: reference to the parent of the node.
+\end_layout
+
+\begin_layout Itemize
+\begin_inset Quotes eld
+\end_inset
+
+child
+\begin_inset Quotes erd
+\end_inset
+
+: reference to the value of which child the node is of its parent (left,
+ right, root).
+\end_layout
+
+\begin_layout Paragraph*
+The open-queue node stores the label and value of each node and uses the
+ value to sort the nodes during insertion.
+ The vertex or edge tree node stores 
+\begin_inset Quotes eld
+\end_inset
+
+hashl
+\begin_inset Quotes erd
+\end_inset
+
+, a hashed label of the vertex or edge, and 
+\begin_inset Quotes eld
+\end_inset
+
+grecord
+\begin_inset Quotes erd
+\end_inset
+
+, the record structure of the vertex or node (see 3.1.2 Graph).
+ The vertex and edge trees are sorted based on the hashed labels.
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+lstparams "language=Lisp,numbers=left,basicstyle={\ttfamily},tabsize=3"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+(defrecord Red-Black-Node [label value color left right parent child])
+\end_layout
+
+\begin_layout Plain Layout
+
+(defrecord Red-Black-Map-Node [hashl grecord color left right parent child])
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsubsection
+Graph
+\end_layout
+
+\begin_layout Paragraph*
+Graphs can be represented in many ways and in this implementation the author
+ has chosen to use red-black trees with hash lookup to store a set of vertices
  and a set of edges.
- It is these two trees that 
+ Each set has its own tree and these two trees make up the entire 
+\begin_inset Quotes eld
+\end_inset
+
+Graph.
+\begin_inset Quotes erd
+\end_inset
+
+ record.
+ The following code defines the graph's record structure.
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+lstparams "language=Lisp,numbers=left,basicstyle={\ttfamily},tabsize=3"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+(defrecord Graph [vertices edges])
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Paragraph*
+Within the 
+\begin_inset Quotes eld
+\end_inset
+
+grecord
+\begin_inset Quotes erd
+\end_inset
+
+ references of the nodes within the red-black trees in either 
+\begin_inset Quotes eld
+\end_inset
+
+vertices
+\begin_inset Quotes erd
+\end_inset
+
+ or 
+\begin_inset Quotes eld
+\end_inset
+
+edges
+\begin_inset Quotes erd
+\end_inset
+
+ are 
+\begin_inset Quotes eld
+\end_inset
+
+Vertex.
+\begin_inset Quotes erd
+\end_inset
+
+ or 
+\begin_inset Quotes eld
+\end_inset
+
+Edge.
+\begin_inset Quotes erd
+\end_inset
+
+ record structures respectively.
+ These records contain all data relevant to either the vertex or edge.
+\end_layout
+
+\begin_layout Paragraph*
+The folowing code defines the vertex and edge record structure.
+ The supplied pieces of data for the vertex are 
+\begin_inset Quotes eld
+\end_inset
+
+label
+\begin_inset Quotes erd
+\end_inset
+
+, 
+\begin_inset Quotes eld
+\end_inset
+
+neigbors
+\begin_inset Quotes erd
+\end_inset
+
+, 
+\begin_inset Quotes eld
+\end_inset
+
+latitude
+\begin_inset Quotes erd
+\end_inset
+
+ and 
+\begin_inset Quotes eld
+\end_inset
+
+longitude
+\begin_inset Quotes erd
+\end_inset
+
+ though the neighbors are implied from the edges.
+ The 
+\begin_inset Quotes eld
+\end_inset
+
+status
+\begin_inset Quotes erd
+\end_inset
+
+, 
+\begin_inset Quotes eld
+\end_inset
+
+distance
+\begin_inset Quotes erd
+\end_inset
+
+ and 
+\begin_inset Quotes eld
+\end_inset
+
+component
+\begin_inset Quotes erd
+\end_inset
+
+ of the vertex are utility data used by functions performing algorithms
+ on the data.
+ The 
+\begin_inset Quotes eld
+\end_inset
+
+status
+\begin_inset Quotes erd
+\end_inset
+
+ allows the breadth first search to check whether a vertex has yet been
+ visited.
+ The 
+\begin_inset Quotes eld
+\end_inset
+
+distance
+\begin_inset Quotes erd
+\end_inset
+
+ is where the distance from finish of the vertex is stored.
+ Finanly 
+\begin_inset Quotes eld
+\end_inset
+
+component
+\begin_inset Quotes erd
+\end_inset
+
+ stores the indicie of the connected component to which the vertex belongs.
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+lstparams "language=Lisp,numbers=left,basicstyle={\ttfamily},tabsize=3"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+(defrecord Vertex [label neighbors latitude longitude status distance component]
+)
+\end_layout
+
+\begin_layout Plain Layout
+
+(defrecord Edge [from to weight label])
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Paragraph*
+The edge record structure contains only data supplied by the assignment.
+ 
 \end_layout
 
 \begin_layout Subsection
@@ -373,7 +716,7 @@ status open
 \end_layout
 
 \begin_layout Paragraph*
-These 
+These two functions 
 \end_layout
 
 \begin_layout Section
@@ -385,144 +728,6 @@ This section describes the implementation of Dijkstra's algorithm, Dijkstra's
  algorithm finds the shortest path between two vertices in a graph.
  In this section only the implementation that does not take into account
  edge weights is discussed.
-\end_layout
-
-\begin_layout Subsection
-Dijksta Function
-\end_layout
-
-\begin_layout Standard
-\begin_inset listings
-lstparams "language=Lisp,numbers=left,basicstyle={\ttfamily},tabsize=3"
-inline false
-status open
-
-\begin_layout Plain Layout
-
-lorem ipsum
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-\begin_inset Float figure
-wide false
-sideways false
-status open
-
-\begin_layout Plain Layout
-\begin_inset Caption Standard
-
-\begin_layout Plain Layout
-Flowchart for 
-\begin_inset Quotes eld
-\end_inset
-
-dijkstra!
-\begin_inset Quotes erd
-\end_inset
-
- Function
-\end_layout
-
-\end_inset
-
-
-\begin_inset Graphics
-	filename /Users/martinjanda/Desktop/Screen Shot 2020-06-03 at 7.17.54 PM.png
-	scale 70
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Plain Layout
-
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Paragraph*
-The above function serves only to call all the helper functions associated
- with finding the shortest path between two vertices following Dijkstra's
- algorithm.
- First the function runs the graph reset.
- This is a simple recursive function that iterates through all the vertices
- of the graph and sets their status to unseen and distance to finish to
- infinity.
- The time complexity of this operation is tightly bound and linear O(n)=
- Ω(n)=Θ(n) as it must iterate through each and every node of the red-black
- tree of vertices.
- The memory complexity of this varys throughout each iteration of the algorithm
- and is roughly equal to the width of the tree at the depth of the corresponding
- iteration this means it is tightly bound O(2
-\begin_inset script superscript
-
-\begin_layout Plain Layout
-i
-\end_layout
-
-\end_inset
-
-)= Ω(2
-\begin_inset script superscript
-
-\begin_layout Plain Layout
-i
-\end_layout
-
-\end_inset
-
-)=Θ(2
-\begin_inset script superscript
-
-\begin_layout Plain Layout
-i
-\end_layout
-
-\end_inset
-
-), where 
-\begin_inset Quotes eld
-\end_inset
-
-i
-\begin_inset Quotes erd
-\end_inset
-
- is the index of the iteration starting at 0.
- This is however a rough estimate and may vary for leaf nodes as red-black
- trees stay within a 1 node difference in maximum and minimum depth.
-\end_layout
-
-\begin_layout Paragraph*
-Next the function checks if the start and finish vertices are part of the
- same connected component.
- If they are, the function continues otherwise the function terminates without
- entering the marking phase as there exists no path between two nodes that
- are not part of the same connected component.
- The time complexity of this operation is O(log n) or Ω(1) and is not tightly
- bound because all that is happening is the lookup of two nodes within the
- graph's red-black tree structure which contains the set of vertices.
- The memory complexity is tightly bound and constant O(1)= Ω(1)=Θ(1) as
- only one node is being accessed at a time while searching for the specified
- node.
-\end_layout
-
-\begin_layout Paragraph*
-If the condition is satisfied the function will call the marking stage which
- is a modified breadth first search.
- Once the marking stage completes the function runs the trace back algorithm
- and terminates.
- The functions/algorithms mentioned in this paragraph will be further stated
- and analyzed in the following subsections.
 \end_layout
 
 \begin_layout Subsection
@@ -557,7 +762,12 @@ status open
 
 \begin_layout Plain Layout
 
-    (let [current (pop-least-node! (:root rb-queue))]
+    (let [current (pick-least-node (:root rb-queue))]
+\end_layout
+
+\begin_layout Plain Layout
+
+      (remove-least-node! (:root rb-queue))
 \end_layout
 
 \begin_layout Plain Layout
@@ -567,17 +777,17 @@ status open
 
 \begin_layout Plain Layout
 
-        (ref-set (:distance @(get-vertex graph (:label @current)))
+        (ref-set (:distance @(get-vertex graph (:label current)))
 \end_layout
 
 \begin_layout Plain Layout
 
-                  @(:value @current)))
+                  @(:value current)))
 \end_layout
 
 \begin_layout Plain Layout
 
-      (when (not (= (:label @current) start))
+      (when (not (= (:label current) start))
 \end_layout
 
 \begin_layout Plain Layout
@@ -587,8 +797,7 @@ status open
 
 \begin_layout Plain Layout
 
-              @(:neighbors @(get-node (hash-label (:label @current)) (:root
- @(:vertices graph))))]
+              @(:neighbors @(get-vertex graph (:label current)))]
 \end_layout
 
 \begin_layout Plain Layout
@@ -727,7 +936,27 @@ status open
 
 \begin_layout Plain Layout
 
-lorem ipsum
+(defn dijkstra-trace-back [graph start finish]
+\end_layout
+
+\begin_layout Plain Layout
+
+  (loop [current start]
+\end_layout
+
+\begin_layout Plain Layout
+
+    (println current)
+\end_layout
+
+\begin_layout Plain Layout
+
+    (when (not (= current finish))
+\end_layout
+
+\begin_layout Plain Layout
+
+      (recur (dijkstra-trace-back-pick-best current)))))
 \end_layout
 
 \end_inset
@@ -793,6 +1022,287 @@ The above algorithm is used after the marking phase of any Dijkstra's algorithm
  and repeats stated steps until it reaches the finish.
  At this point Dijkstra's algorithm has finished and the shortest path between
  the start and finish vertices has been printed.
+\end_layout
+
+\begin_layout Subsubsection
+Picking the Neighbor With The Lowest Distance To Finish
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+lstparams "language=Lisp,numbers=left,basicstyle={\ttfamily},tabsize=3"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+(defn dijkstra-trace-back-pick-best [vertex]
+\end_layout
+
+\begin_layout Plain Layout
+
+  (loop [neighbors @(:neighbors @(get-vertex graph (:label current)))
+\end_layout
+
+\begin_layout Plain Layout
+
+         best-distance ##Inf
+\end_layout
+
+\begin_layout Plain Layout
+
+         best-label nil]
+\end_layout
+
+\begin_layout Plain Layout
+
+    (if (= (count neighbors) 1)
+\end_layout
+
+\begin_layout Plain Layout
+
+      (if (< @(:distance @(get-vertex graph (first neighbors))) best-distance)
+\end_layout
+
+\begin_layout Plain Layout
+
+        (first neighbors)
+\end_layout
+
+\begin_layout Plain Layout
+
+        best-label)
+\end_layout
+
+\begin_layout Plain Layout
+
+      (if (< @(:distance @(get-vertex graph (first neighbors))) best-distance)
+\end_layout
+
+\begin_layout Plain Layout
+
+        (recur (rest neighbors)
+\end_layout
+
+\begin_layout Plain Layout
+
+               @(:distance @(get-vertex graph (first neighbors)))
+\end_layout
+
+\begin_layout Plain Layout
+
+               (first neighbors))
+\end_layout
+
+\begin_layout Plain Layout
+
+        (recur (rest neighbors)
+\end_layout
+
+\begin_layout Plain Layout
+
+                best-distance
+\end_layout
+
+\begin_layout Plain Layout
+
+                best-label)))))
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Paragraph*
+Chosing the neighbor with the lowest distance to finish is as simple as
+ iterating through all the neighbors and keeping track of the lowest distance
+ value over iterations.
+ The above function acomplishes exactly that and returns the label of the
+ neighbor with the lowest distance to finish.
+ The time complexity of this function is tightly bound and linear O(n)=
+ Ω(n)=Θ(n) where 
+\begin_inset Quotes eld
+\end_inset
+
+n
+\begin_inset Quotes erd
+\end_inset
+
+ is the number of neighbors of the vertex.
+ This is because the distance each neighbor must be checked once to find
+ the neighbor with the lowest value.
+ The memory complexity of this function is tightly bound and linear O(n)=
+ Ω(n)=Θ(n) as all of the nei
+\end_layout
+
+\begin_layout Subsection
+Dijkstra Function
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+lstparams "language=Lisp,numbers=left,basicstyle={\ttfamily},tabsize=3"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+(defn dijkstra! [graph start finish]
+\end_layout
+
+\begin_layout Plain Layout
+
+  (graph-reset! graph)
+\end_layout
+
+\begin_layout Plain Layout
+
+  (if (= @(:component @(get-vertex graph start))
+\end_layout
+
+\begin_layout Plain Layout
+
+         @(:component @(get-vertex graph finish)))
+\end_layout
+
+\begin_layout Plain Layout
+
+    (do
+\end_layout
+
+\begin_layout Plain Layout
+
+      (breadth-first-search-dijkstra graph start finish)
+\end_layout
+
+\begin_layout Plain Layout
+
+      (dijkstra-trace-back graph start finish))
+\end_layout
+
+\begin_layout Plain Layout
+
+    (println "No path exists!")))
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+Flowchart for 
+\begin_inset Quotes eld
+\end_inset
+
+dijkstra!
+\begin_inset Quotes erd
+\end_inset
+
+ Function
+\end_layout
+
+\end_inset
+
+
+\begin_inset Graphics
+	filename /Users/martinjanda/Desktop/Screen Shot 2020-06-03 at 7.17.54 PM.png
+	scale 70
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Paragraph*
+The above function serves only to call all the helper functions associated
+ with finding the shortest path between two vertices following Dijkstra's
+ algorithm.
+ First the function runs the graph reset.
+ This is a simple recursive function that iterates through all the vertices
+ of the graph and sets their status to unseen and distance to finish to
+ infinity.
+ The time complexity of this operation is tightly bound and linear O(n)=
+ Ω(n)=Θ(n) as it must iterate through each and every node of the red-black
+ tree of vertices.
+ The memory complexity of this varys throughout each iteration of the algorithm
+ and is roughly equal to the width of the tree at the depth of the corresponding
+ iteration this means it is tightly bound O(2
+\begin_inset script superscript
+
+\begin_layout Plain Layout
+i
+\end_layout
+
+\end_inset
+
+)= Ω(2
+\begin_inset script superscript
+
+\begin_layout Plain Layout
+i
+\end_layout
+
+\end_inset
+
+)=Θ(2
+\begin_inset script superscript
+
+\begin_layout Plain Layout
+i
+\end_layout
+
+\end_inset
+
+), where 
+\begin_inset Quotes eld
+\end_inset
+
+i
+\begin_inset Quotes erd
+\end_inset
+
+ is the index of the iteration starting at 0.
+ This is however a rough estimate and may vary for leaf nodes as red-black
+ trees stay within a 1 node difference in maximum and minimum depth.
+\end_layout
+
+\begin_layout Paragraph*
+Next the function checks if the start and finish vertices are part of the
+ same connected component.
+ If they are, the function continues otherwise the function terminates without
+ entering the marking phase as there exists no path between two nodes that
+ are not part of the same connected component.
+ The time complexity of this operation is O(log n) or Ω(1) and is not tightly
+ bound because all that is happening is the lookup of two nodes within the
+ graph's red-black tree structure which contains the set of vertices.
+ The memory complexity is tightly bound and constant O(1)= Ω(1)=Θ(1) as
+ only one node is being accessed at a time while searching for the specified
+ node.
+\end_layout
+
+\begin_layout Paragraph*
+If the condition is satisfied the function will call the marking stage which
+ is a modified breadth first search.
+ Once the marking stage completes the function runs the trace back algorithm
+ and terminates.
+ The functions/algorithms mentioned in this paragraph will be further stated
+ and analyzed in the following subsections.
 \end_layout
 
 \end_body

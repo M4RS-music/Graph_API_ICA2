@@ -237,8 +237,140 @@ Prerequisite Structures and Functions
 
 \begin_layout Paragraph*
 The following are descriptions of major structures and functions that were
- implemented in order to create an efficient interface between the implemented
+ implemented in order to create an efficient interface between implemented
  algorithms and the data supplied by the assignment.
+\end_layout
+
+\begin_layout Subsection
+Structuring Data
+\end_layout
+
+\begin_layout Paragraph*
+Graphs can be represented in many ways
+\end_layout
+
+\begin_layout Subsection
+Adding Data
+\end_layout
+
+\begin_layout Paragraph*
+The assignment supplied a list of statements that were meant to use the
+ following functions:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+lstparams "language=Lisp,numbers=left,basicstyle={\ttfamily},tabsize=3"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+(defn graph-add-vertex! [graph label latitude longitude]
+\end_layout
+
+\begin_layout Plain Layout
+
+  (let [hashed-label (hash-label label)]
+\end_layout
+
+\begin_layout Plain Layout
+
+    (when (not (red-black-hashmap-contains? hashed-label (:root @(:vertices
+ graph))))
+\end_layout
+
+\begin_layout Plain Layout
+
+      (map-node-insert-helper-2!
+\end_layout
+
+\begin_layout Plain Layout
+
+        (:root @(:vertices graph))
+\end_layout
+
+\begin_layout Plain Layout
+
+        nil         hashed-label
+\end_layout
+
+\begin_layout Plain Layout
+
+        (Vertex.
+ label (ref '()) latitude longitude (ref unseen) (ref ##Inf) (ref nil))
+\end_layout
+
+\begin_layout Plain Layout
+
+        false))))
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+lstparams "language=Lisp,numbers=left,basicstyle={\ttfamily},tabsize=3"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+(defn graph-add-edge! [graph from to label weight]
+\end_layout
+
+\begin_layout Plain Layout
+
+  (let [hashed-edge-key (hash-label (edge-key from to))]
+\end_layout
+
+\begin_layout Plain Layout
+
+    (when (not (red-black-hashmap-contains? hashed-edge-key (:root @(:edges
+ graph)))))
+\end_layout
+
+\begin_layout Plain Layout
+
+      (map-node-insert-helper-2!
+\end_layout
+
+\begin_layout Plain Layout
+
+        (:root @(:edges graph))
+\end_layout
+
+\begin_layout Plain Layout
+
+        nil
+\end_layout
+
+\begin_layout Plain Layout
+
+        hashed-edge-key
+\end_layout
+
+\begin_layout Plain Layout
+
+        (Edge.
+ from to weight label)
+\end_layout
+
+\begin_layout Plain Layout
+
+        true)))
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Paragraph*
+These 
 \end_layout
 
 \begin_layout Section

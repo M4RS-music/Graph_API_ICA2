@@ -372,7 +372,7 @@
   (= @(:status @(get-vertex graph label)) unseen))
 ;;;;Get;;;;
 
-;;;;BFS;;;;
+;;;;BFS D;;;;
 (defn breadth-first-search-dijkstra [graph start finish]
   (node-insert! rb-queue finish 0)
   (loop []
@@ -390,10 +390,40 @@
               (node-insert! rb-queue current-neighbor (inc @(:value @current)))))
           (recur (rest neighbors)))))
     (recur))))
-;;;;BFS;;;;
+;;;;BFS D;;;;
 
 ;;;;Dijksta Without Edge Weights;;;;
+(defn dijkstra-trace-back-pick-best [vertex]
+  (loop [neighbors @(:neighbors @(get-vertex graph (:label current)))
+         best-distance ##Inf
+         best-label nil]
+    (if (= (count neighbors) 1)
+      (if (< @(:distance @(get-vertex graph (first neighbors))) best-distance)
+        (first neighbors)
+        best-label)
+      (if (< @(:distance @(get-vertex graph (first neighbors))) best-distance)
+        (recur (rest neighbors)
+               @(:distance @(get-vertex graph (first neighbors)))
+               (first neighbors))
+        (recur (rest neighbors)
+                best-distance
+                best-label)))))
 
+
+(defn dijkstra-trace-back [graph start finish]
+  (loop [current start]
+    (println current)
+    (when (not (= current finish))
+      (recur (dijkstra-trace-back-pick-best current)))))
+
+(defn dijkstra! [graph start finish]
+  (graph-reset! graph)
+  (if (= @(:component @(get-vertex graph start))
+         @(:component @(get-vertex graph finish)))
+    (do
+      (breadth-first-search-dijkstra graph start finish)
+      (dijkstra-trace-back graph start finish))
+    (println "No path exists!")))
 ;;;;Dijksta Without Edge Weights;;;;
 
 ;;;;;;;;;;;;;;;;;;;;;;; Debugging Queue and Graph ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
