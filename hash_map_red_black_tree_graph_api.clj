@@ -97,69 +97,47 @@
         (ref-set (:color @grandparent) Red)))
       (red-black-rules-checker! grandparent)))
 
- ; (defn left-rotate! [node]
- ;   (let [a node
- ;        b (:right @node)
- ;        c (:left @b)
- ;        av @a
- ;        ac @(:child av)
- ;        bv @b
- ;        cv @c]
- ;   (dosync
- ;     (ref-set a @b)
- ;     )))
- ;
- ; (defn right-rotate! [node]
- ;   (let [b node
- ;        a (:left @node)
- ;        c (:right @a)
- ;        av @a
- ;        bv @b
- ;        bc @(:child bv)
- ;        cv @c]
- ;   (dosync
- ;     (ref-set b @a)
- ;     )))
-
 (defn rb-rotate-left [a LEFT RIGHT]
- (let [b @(RIGHT a)
-       p (:parent a)
-       child @(:child a)]
-   (dosync
-    (ref-set (RIGHT a) @(LEFT b))
-    (ref-set (LEFT b) a)
-    (ref-set (:parent a) b)
-    (ref-set (:child a) Left)
-    (ref-set (:child b) child)
-    (when (not (nil? @(RIGHT a)))
-      (ref-set (:parent @(RIGHT a)) a)
-      (ref-set (:child @(RIGHT a)) Right))
-    (when (not (nil? p))
-      (if (= a @(LEFT p))
-        (ref-set (LEFT p) b)
-        (if (= a @(RIGHT p))
-          (ref-set (RIGHT p) b))))
-    (ref-set (:parent b) p))))
-
-(defn rb-rotate-right [a LEFT RIGHT]
+  (println "rb-rotate-right")
   (let [b @(RIGHT a)
-        p (:parent a)
+        p @(:parent a)
         child @(:child a)]
     (dosync
-     (ref-set (RIGHT a) @(LEFT b))
-     (ref-set (LEFT b) a)
-     (ref-set (:parent a) b)
-     (ref-set (:child a) Right)
-     (ref-set (:child b) child)
-     (when (not (nil? @(RIGHT a)))
-       (ref-set (:parent @(RIGHT a)) a)
-       (ref-set (:child @(RIGHT a)) Left))
-     (when (not (nil? p))
-       (if (= a @(LEFT p))
-         (ref-set (LEFT p) b)
-         (if (= a @(RIGHT p))
-           (ref-set (RIGHT p) b))))
-     (ref-set (:parent b) p))))
+      (ref-set (RIGHT a) @(LEFT b))
+      (ref-set (LEFT b) a)
+      (ref-set (:parent a) b)
+      (ref-set (:child a) Left)
+      (ref-set (:child b) child)
+      (when (not (nil? @(RIGHT a)))
+        (ref-set (:parent @(RIGHT a)) a)
+        (ref-set (:child @(RIGHT a)) Right))
+      (when (not (nil? p))
+        (if (= a @(LEFT p))
+          (ref-set (LEFT p) b)
+          (if (= a @(RIGHT p))
+            (ref-set (RIGHT p) b))))
+      (ref-set (:parent b) p))))
+
+(defn rb-rotate-right [a LEFT RIGHT]
+  (println "rb-rotate-right")
+  (let [b @(RIGHT a)
+        p @(:parent a)
+        child @(:child a)]
+    (dosync
+      (ref-set (RIGHT a) @(LEFT b))
+      (ref-set (LEFT b) a)
+      (ref-set (:parent a) b)
+      (ref-set (:child a) Right)
+      (ref-set (:child b) child)
+      (when (not (nil? @(RIGHT a)))
+        (ref-set (:parent @(RIGHT a)) a)
+        (ref-set (:child @(RIGHT a)) Left))
+      (when (not (nil? p))
+        (if (= a @(LEFT p))
+          (ref-set (LEFT p) b)
+          (if (= a @(RIGHT p))
+            (ref-set (RIGHT p) b))))
+      (ref-set (:parent b) p))))
 
 (defn left-rotate! [a]
  (rb-rotate-left @a :left :right))
@@ -247,7 +225,8 @@
     (do
       (dosync
         (ref-set node
-          (make-map-node! hashed-label grecord Black parent Root)))
+          (make-map-node! hashed-label grecord Black parent Roo
+            t)))
       (when is-edge?
         (neighbor-set! (:to @(:grecord @node)) (:from @(:grecord @node)))))
     (cond
@@ -326,13 +305,12 @@
 (defn pick-least-node [node]
   (if (not (tree-node-empty? (:left @node)))
     (pick-least-node (:left @node))
-    (:label @node)))
+    @node))
 
-(defn pop-least-node! [node]
+(defn remove-least-node! [node]
   (if (not (tree-node-empty? (:left @node)))
-    (pop-least-node! (:left @node))
+    (remove-least-node! (:left @node))
     (dosync
-      node
       (if (node-root? @node)
         (if (tree-node-empty? (:right @node))
           (ref-set
@@ -391,13 +369,13 @@
   (node-insert! rb-queue finish 0)
   (loop []
     (when (not (red-black-tree-empty? rb-queue))
-    (let [current (pop-least-node! (:root rb-queue))]
+    (let [current (pick-least-node (:root rb-queue))]
       (dosync
-        (ref-set (:distance @(get-vertex graph (:label @current)))
-                  @(:value @current)))
-      (when (not (= (:label @current) start))
+        (ref-set (:distance @(get-vertex graph (:label current)))
+                  @(:value current)))
+      (when (not (= (:label current) start))
         (loop [neighbors
-              @(:neighbors @(get-node (hash-label (:label @current)) (:root @(:vertices graph))))]
+              @(:neighbors @(get-vertex graph (:label current)))]
           (let [current-neighbor (first neighbors)]
             (when (get-vertex-unseen? graph current-neighbor)
               (node-insert! rb-queue current-neighbor (inc @(:value @current)))))
