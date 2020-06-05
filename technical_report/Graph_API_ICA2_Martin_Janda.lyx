@@ -33,7 +33,7 @@
 \spacing single
 \use_hyperref false
 \papersize default
-\use_geometry false
+\use_geometry true
 \use_package amsmath 1
 \use_package amssymb 1
 \use_package cancel 1
@@ -58,6 +58,10 @@
 \shortcut idx
 \color #008000
 \end_index
+\leftmargin 20page%
+\topmargin 3pheight%
+\rightmargin 20page%
+\bottommargin 3pheight%
 \secnumdepth 3
 \tocdepth 3
 \paragraph_separation indent
@@ -385,7 +389,7 @@ lyx is shit
 
 \begin_layout Standard
 \begin_inset listings
-lstparams "language=Lisp,numbers=left,basicstyle={\ttfamily},tabsize=3"
+lstparams "language=Lisp,numbers=left,basicstyle={\ttfamily},tabsize=1"
 inline false
 status open
 
@@ -430,7 +434,7 @@ lyx is shit
 
 \begin_layout Standard
 \begin_inset listings
-lstparams "language=Lisp,numbers=left,basicstyle={\ttfamily},tabsize=3"
+lstparams "language=Lisp,numbers=left,basicstyle={\ttfamily},tabsize=1"
 inline false
 status open
 
@@ -586,7 +590,7 @@ lyx is shit
 
 \begin_layout Standard
 \begin_inset listings
-lstparams "language=Lisp,numbers=left,basicstyle={\ttfamily},tabsize=3"
+lstparams "language=Lisp,numbers=left,basicstyle={\ttfamily},tabsize=1"
 inline false
 status open
 
@@ -626,7 +630,7 @@ lyx is shit
 
 \begin_layout Standard
 \begin_inset listings
-lstparams "language=Lisp,numbers=left,basicstyle={\ttfamily},tabsize=3"
+lstparams "language=Lisp,numbers=left,basicstyle={\ttfamily},tabsize=1"
 inline false
 status open
 
@@ -642,8 +646,12 @@ status open
 
 \begin_layout Plain Layout
 
-    (when (not (red-black-hashmap-contains? hashed-label (:root @(:vertices
- graph))))
+    (when (not (red-black-hashmap-contains?
+\end_layout
+
+\begin_layout Plain Layout
+
+				hashed-label (:root @(:vertices graph))))
 \end_layout
 
 \begin_layout Plain Layout
@@ -664,7 +672,12 @@ status open
 \begin_layout Plain Layout
 
         (Vertex.
- label (ref '()) latitude longitude (ref unseen) (ref ##Inf) (ref nil))
+ label (ref '()) latitude longitude
+\end_layout
+
+\begin_layout Plain Layout
+
+				 (ref unseen) (ref ##Inf) (ref nil))
 \end_layout
 
 \begin_layout Plain Layout
@@ -679,7 +692,7 @@ status open
 
 \begin_layout Standard
 \begin_inset listings
-lstparams "language=Lisp,numbers=left,basicstyle={\ttfamily},tabsize=3"
+lstparams "language=Lisp,numbers=left,basicstyle={\ttfamily},tabsize=1"
 inline false
 status open
 
@@ -695,8 +708,12 @@ status open
 
 \begin_layout Plain Layout
 
-    (when (not (red-black-hashmap-contains? hashed-edge-key (:root @(:edges
- graph)))))
+    (when (not (red-black-hashmap-contains?
+\end_layout
+
+\begin_layout Plain Layout
+
+				hashed-edge-key (:root @(:edges graph)))))
 \end_layout
 
 \begin_layout Plain Layout
@@ -756,7 +773,7 @@ Breadth First Search Algorithm
 
 \begin_layout Standard
 \begin_inset listings
-lstparams "language=Lisp,numbers=left,basicstyle={\ttfamily},tabsize=3"
+lstparams "language=Lisp,numbers=left,basicstyle={\ttfamily},tabsize=1"
 inline false
 status open
 
@@ -932,7 +949,7 @@ breadth-first-search!
 
 \begin_inset Graphics
 	filename /Users/martinjanda/Documents/bfs_flowchart.png
-	scale 70
+	scale 75
 
 \end_inset
 
@@ -950,7 +967,7 @@ Trace Back Function for Dijkstra's Algorithm
 
 \begin_layout Standard
 \begin_inset listings
-lstparams "language=Lisp,numbers=left,basicstyle={\ttfamily},tabsize=3"
+lstparams "language=Lisp,numbers=left,basicstyle={\ttfamily},tabsize=1"
 inline false
 status open
 
@@ -1014,7 +1031,6 @@ dijksta-trace-back
 
 \begin_inset Graphics
 	filename /Users/martinjanda/Desktop/Screen Shot 2020-06-03 at 7.30.11 PM.png
-	scale 75
 
 \end_inset
 
@@ -1050,7 +1066,7 @@ Picking the Neighbor With The Lowest Distance To Finish
 
 \begin_layout Standard
 \begin_inset listings
-lstparams "language=Lisp,numbers=left,basicstyle={\ttfamily},tabsize=3"
+lstparams "language=Lisp,numbers=left,basicstyle={\ttfamily},tabsize=1"
 inline false
 status open
 
@@ -1163,7 +1179,7 @@ Dijkstra Function
 
 \begin_layout Standard
 \begin_inset listings
-lstparams "language=Lisp,numbers=left,basicstyle={\ttfamily},tabsize=3"
+lstparams "language=Lisp,numbers=left,basicstyle={\ttfamily},tabsize=1"
 inline false
 status open
 
@@ -1238,7 +1254,6 @@ dijkstra!
 
 \begin_inset Graphics
 	filename /Users/martinjanda/Desktop/Screen Shot 2020-06-03 at 7.17.54 PM.png
-	scale 70
 
 \end_inset
 

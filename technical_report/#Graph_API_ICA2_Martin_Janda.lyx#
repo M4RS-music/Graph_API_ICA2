@@ -33,7 +33,7 @@
 \spacing single
 \use_hyperref false
 \papersize default
-\use_geometry false
+\use_geometry true
 \use_package amsmath 1
 \use_package amssymb 1
 \use_package cancel 1
@@ -58,6 +58,10 @@
 \shortcut idx
 \color #008000
 \end_index
+\leftmargin 20page%
+\topmargin 3pheight%
+\rightmargin 20page%
+\bottommargin 3pheight%
 \secnumdepth 3
 \tocdepth 3
 \paragraph_separation indent
@@ -385,7 +389,7 @@ lyx is shit
 
 \begin_layout Standard
 \begin_inset listings
-lstparams "language=Lisp,numbers=left,basicstyle={\ttfamily},tabsize=3"
+lstparams "language=Lisp,numbers=left,basicstyle={\ttfamily},tabsize=1"
 inline false
 status open
 
@@ -430,7 +434,7 @@ lyx is shit
 
 \begin_layout Standard
 \begin_inset listings
-lstparams "language=Lisp,numbers=left,basicstyle={\ttfamily},tabsize=3"
+lstparams "language=Lisp,numbers=left,basicstyle={\ttfamily},tabsize=1"
 inline false
 status open
 
@@ -586,7 +590,7 @@ lyx is shit
 
 \begin_layout Standard
 \begin_inset listings
-lstparams "language=Lisp,numbers=left,basicstyle={\ttfamily},tabsize=3"
+lstparams "language=Lisp,numbers=left,basicstyle={\ttfamily},tabsize=1"
 inline false
 status open
 
@@ -626,7 +630,7 @@ lyx is shit
 
 \begin_layout Standard
 \begin_inset listings
-lstparams "language=Lisp,numbers=left,basicstyle={\ttfamily},tabsize=3"
+lstparams "language=Lisp,numbers=left,basicstyle={\ttfamily},tabsize=1"
 inline false
 status open
 
@@ -642,8 +646,12 @@ status open
 
 \begin_layout Plain Layout
 
-    (when (not (red-black-hashmap-contains? hashed-label (:root @(:vertices
- graph))))
+    (when (not (red-black-hashmap-contains?
+\end_layout
+
+\begin_layout Plain Layout
+
+				hashed-label (:root @(:vertices graph))))
 \end_layout
 
 \begin_layout Plain Layout
@@ -664,7 +672,12 @@ status open
 \begin_layout Plain Layout
 
         (Vertex.
- label (ref '()) latitude longitude (ref unseen) (ref ##Inf) (ref nil))
+ label (ref '()) latitude longitude
+\end_layout
+
+\begin_layout Plain Layout
+
+					(ref unseen) (ref ##Inf) (ref nil))
 \end_layout
 
 \begin_layout Plain Layout
@@ -679,7 +692,7 @@ status open
 
 \begin_layout Standard
 \begin_inset listings
-lstparams "language=Lisp,numbers=left,basicstyle={\ttfamily},tabsize=3"
+lstparams "language=Lisp,numbers=left,basicstyle={\ttfamily},tabsize=1"
 inline false
 status open
 
@@ -756,7 +769,7 @@ Breadth First Search Algorithm
 
 \begin_layout Standard
 \begin_inset listings
-lstparams "language=Lisp,numbers=left,basicstyle={\ttfamily},tabsize=3"
+lstparams "language=Lisp,numbers=left,basicstyle={\ttfamily},tabsize=1"
 inline false
 status open
 
@@ -932,7 +945,7 @@ breadth-first-search!
 
 \begin_inset Graphics
 	filename /Users/martinjanda/Documents/bfs_flowchart.png
-	scale 70
+	scale 75
 
 \end_inset
 
@@ -950,7 +963,7 @@ Trace Back Function for Dijkstra's Algorithm
 
 \begin_layout Standard
 \begin_inset listings
-lstparams "language=Lisp,numbers=left,basicstyle={\ttfamily},tabsize=3"
+lstparams "language=Lisp,numbers=left,basicstyle={\ttfamily},tabsize=1"
 inline false
 status open
 
@@ -1014,7 +1027,6 @@ dijksta-trace-back
 
 \begin_inset Graphics
 	filename /Users/martinjanda/Desktop/Screen Shot 2020-06-03 at 7.30.11 PM.png
-	scale 75
 
 \end_inset
 
@@ -1050,18 +1062,18 @@ Picking the Neighbor With The Lowest Distance To Finish
 
 \begin_layout Standard
 \begin_inset listings
-lstparams "language=Lisp,numbers=left,basicstyle={\ttfamily},tabsize=3"
+lstparams "language=Lisp,numbers=left,basicstyle={\ttfamily},tabsize=1"
 inline false
 status open
 
 \begin_layout Plain Layout
 
-(defn dijkstra-trace-back-pick-best [vertex]
+(defn dijkstra-trace-back-pick-best [graph vertex]
 \end_layout
 
 \begin_layout Plain Layout
 
-  (loop [neighbors @(:neighbors @(get-vertex graph (:label current)))
+  (loop [neighbors @(:neighbors @(get-vertex graph vertex))
 \end_layout
 
 \begin_layout Plain Layout
@@ -1163,7 +1175,7 @@ Dijkstra Function
 
 \begin_layout Standard
 \begin_inset listings
-lstparams "language=Lisp,numbers=left,basicstyle={\ttfamily},tabsize=3"
+lstparams "language=Lisp,numbers=left,basicstyle={\ttfamily},tabsize=1"
 inline false
 status open
 
@@ -1238,7 +1250,6 @@ dijkstra!
 
 \begin_inset Graphics
 	filename /Users/martinjanda/Desktop/Screen Shot 2020-06-03 at 7.17.54 PM.png
-	scale 70
 
 \end_inset
 
@@ -1300,7 +1311,7 @@ i
 
  is the index of the iteration starting at 0.
  This is however a rough estimate and may vary for leaf nodes as red-black
- trees stay within a 1 node difference in maximum and minimum depth.
+ trees stay within 1 node difference of maximum and minimum depth.
 \end_layout
 
 \begin_layout Paragraph*
@@ -1322,8 +1333,7 @@ If the condition is satisfied the function will call the marking stage which
  is a modified breadth first search.
  Once the marking stage completes the function runs the trace back algorithm
  and terminates.
- The functions/algorithms mentioned in this paragraph will be further stated
- and analyzed in the following subsections.
+ 
 \end_layout
 
 \end_body

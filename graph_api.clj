@@ -292,7 +292,7 @@
   (if (red-black-tree-empty? tree)
     (dosync
       (ref-set (:root tree)
-        (make-node! label value Black nil nil)))
+        (make-node! label value Black nil Root)))
     (cond
       (< value @(:value @(:root tree)))
         (node-insert-helper! (:left @(:root tree)) (:root tree) label value Left)
@@ -387,7 +387,7 @@
               @(:neighbors @(get-vertex graph (:label current)))]
           (let [current-neighbor (first neighbors)]
             (when (get-vertex-unseen? graph current-neighbor)
-              (node-insert! rb-queue current-neighbor (inc @(:value @current)))))
+              (node-insert! rb-queue current-neighbor (inc @(:value current)))))
           (recur (rest neighbors)))))
     (recur))))
 ;;;;BFS Dijkstra;;;;
@@ -420,7 +420,7 @@
   (if (= @(:component @(get-vertex graph start))
          @(:component @(get-vertex graph finish)))
     (do
-      (breadth-first-search-dijkstra graph start finish)
+      (breadth-first-search-dijkstra! graph start finish)
       (dijkstra-trace-back graph start finish))
     (println "No path exists!")))
 ;;;;Dijksta Without Edge Weights;;;;
@@ -476,7 +476,7 @@
               @(:neighbors @(get-vertex graph (:label current)))]
           (let [current-neighbor (first neighbors)]
             (when (get-vertex-unseen? graph current-neighbor)
-              (node-insert! rb-queue current-neighbor (inc @(:value @current)))))
+              (node-insert! rb-queue current-neighbor (inc @(:value current)))))
           (recur (rest neighbors)))))
     (recur))))
 ;;;;;;;BFS A*;;;;;;;
@@ -573,9 +573,9 @@
     (if (= @(:color @node) 0)
       (println "Color: Black")
       (println "Color: Red"))
-    (if (= @(:child @node) 2)
+    (if (= @(:child @node) Left)
       (println "Child: Left")
-      (if (nil? @(:child @node))
+      (if (= @(:child @node) Root)
         (println "Child: Root")
         (println "Child: Right")))
     (println "=======================")
