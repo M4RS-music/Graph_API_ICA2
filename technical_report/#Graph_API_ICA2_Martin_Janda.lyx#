@@ -230,7 +230,8 @@ Aim
 The aim of the assignment was to describe the implementation of the algorithms
  specified by the assignment brief.
  This technical report also adresses the graph and helper structures that
- have been implemented as they are a large part of the code being submitted.
+ have been implemented as they are a large part of the code being submitted
+ and contribute directly to the efficiency of the algorithms.
  All code in this doccument was written by the author in Clojure a list
  proccessing programming language.
 \end_layout
@@ -250,9 +251,9 @@ Data Structures
 \end_layout
 
 \begin_layout Paragraph*
-This subsection addresses the underlying record structure of the implementation.
- Words on the efficiency of and justifications for these structures will
- be in subsection X.X.
+This subsection addresses the underlying record structures of the implementation.
+ Words on the efficiency of and justifications for these structures are
+ in subsection 3.2.
 \end_layout
 
 \begin_layout Subsubsection
@@ -260,14 +261,11 @@ Red-Black Trees
 \end_layout
 
 \begin_layout Paragraph*
-The main data structure used in this implementation is a red-black tree.
+The data structure used for the open-queue in this implementation is a red-black
+ tree.
  A red-black tree is a self balancing form of a binary search tree.
- Red-black trees are responsible for storing the vertices, edges and open-queue
- (for breadth first search) in this implementation.
  The red-black tree is is defined by the following code, a reference to
  the root node of the tree.
- The record on line one is for the open queue and the record on line two
- is used for the vertices and edges.
 \end_layout
 
 \begin_layout Paragraph*
@@ -285,11 +283,6 @@ status open
 (defrecord Red-Black-Tree [root])
 \end_layout
 
-\begin_layout Plain Layout
-
-(defrecord Red-Black-Tree-Map [root])
-\end_layout
-
 \end_inset
 
 
@@ -297,10 +290,29 @@ status open
 
 \begin_layout Paragraph*
 The root of the tree is a reference to a node.
- Tree nodes are defined by the code below.
- The two lines correspond to the open-queue, vertices and edges as with
- the red-black tree definitions.
- Both types of node keep track of the following
+ Tree nodes are defined by the code below and keep track of the following:
+\end_layout
+
+\begin_layout Itemize
+\begin_inset Quotes eld
+\end_inset
+
+label
+\begin_inset Quotes erd
+\end_inset
+
+: the label of the node.
+\end_layout
+
+\begin_layout Itemize
+\begin_inset Quotes eld
+\end_inset
+
+value
+\begin_inset Quotes erd
+\end_inset
+
+: the value by which the node is sorted.
 \end_layout
 
 \begin_layout Itemize
@@ -361,29 +373,6 @@ child
 \end_layout
 
 \begin_layout Paragraph*
-The open-queue node stores the label and value of each node and uses the
- value to sort the nodes during insertion.
- The vertex or edge tree node stores 
-\begin_inset Quotes eld
-\end_inset
-
-hashl
-\begin_inset Quotes erd
-\end_inset
-
-, a hashed label of the vertex or edge, and 
-\begin_inset Quotes eld
-\end_inset
-
-grecord
-\begin_inset Quotes erd
-\end_inset
-
-, the record structure of the vertex or node (see 3.1.2 Graph).
- The vertex and edge trees are sorted based on the hashed labels.
-\end_layout
-
-\begin_layout Paragraph*
 lyx is shit
 \end_layout
 
@@ -398,34 +387,20 @@ status open
 (defrecord Red-Black-Node [label value color left right parent child])
 \end_layout
 
-\begin_layout Plain Layout
-
-(defrecord Red-Black-Map-Node [hashl grecord color left right parent child])
-\end_layout
-
 \end_inset
 
 
 \end_layout
 
 \begin_layout Subsubsection
-Graph
+Hash Maps
 \end_layout
 
 \begin_layout Paragraph*
-Graphs can be represented in many ways and in this implementation the author
- has chosen to use red-black trees with hash lookup to store a set of vertices
- and a set of edges.
- Each set has its own tree and these two trees make up the entire 
-\begin_inset Quotes eld
-\end_inset
-
-Graph.
-\begin_inset Quotes erd
-\end_inset
-
- record.
- The following code defines the graph's record structure.
+Clojure's built in hash map data structure is used to store all the nodes
+ and vertices of the graph.
+ The graph itself is a record that contains references to two hash maps,
+ one for the vertices and one for the edges.
 \end_layout
 
 \begin_layout Paragraph*
@@ -448,180 +423,20 @@ status open
 
 \end_layout
 
-\begin_layout Paragraph*
-Within the 
-\begin_inset Quotes eld
-\end_inset
-
-grecord
-\begin_inset Quotes erd
-\end_inset
-
- references of the nodes within the red-black trees in either 
-\begin_inset Quotes eld
-\end_inset
-
-vertices
-\begin_inset Quotes erd
-\end_inset
-
- or 
-\begin_inset Quotes eld
-\end_inset
-
-edges
-\begin_inset Quotes erd
-\end_inset
-
- are 
-\begin_inset Quotes eld
-\end_inset
-
-Vertex.
-\begin_inset Quotes erd
-\end_inset
-
- or 
-\begin_inset Quotes eld
-\end_inset
-
-Edge.
-\begin_inset Quotes erd
-\end_inset
-
- record structures respectively.
- These records contain all data relevant to either the vertex or edge.
-\end_layout
-
-\begin_layout Paragraph*
-The folowing code defines the vertex and edge record structure.
- The supplied pieces of data for the vertex are 
-\begin_inset Quotes eld
-\end_inset
-
-label
-\begin_inset Quotes erd
-\end_inset
-
-, 
-\begin_inset Quotes eld
-\end_inset
-
-neigbors
-\begin_inset Quotes erd
-\end_inset
-
-, 
-\begin_inset Quotes eld
-\end_inset
-
-latitude
-\begin_inset Quotes erd
-\end_inset
-
- and 
-\begin_inset Quotes eld
-\end_inset
-
-longitude
-\begin_inset Quotes erd
-\end_inset
-
- though the neighbors are implied from the edges.
- The 
-\begin_inset Quotes eld
-\end_inset
-
-status
-\begin_inset Quotes erd
-\end_inset
-
-, 
-\begin_inset Quotes eld
-\end_inset
-
-distance
-\begin_inset Quotes erd
-\end_inset
-
- and 
-\begin_inset Quotes eld
-\end_inset
-
-component
-\begin_inset Quotes erd
-\end_inset
-
- of the vertex are utility data used by functions performing algorithms
- on the data.
- The 
-\begin_inset Quotes eld
-\end_inset
-
-status
-\begin_inset Quotes erd
-\end_inset
-
- allows the breadth first search to check whether a vertex has yet been
- visited.
- The 
-\begin_inset Quotes eld
-\end_inset
-
-distance
-\begin_inset Quotes erd
-\end_inset
-
- is where the distance from finish of the vertex is stored.
- Finanly 
-\begin_inset Quotes eld
-\end_inset
-
-component
-\begin_inset Quotes erd
-\end_inset
-
- stores the indicie of the connected component to which the vertex belongs.
-\end_layout
-
-\begin_layout Paragraph*
-lyx is shit
-\end_layout
-
-\begin_layout Standard
-\begin_inset listings
-lstparams "language=Lisp,numbers=left,basicstyle={\ttfamily},tabsize=1"
-inline false
-status open
-
-\begin_layout Plain Layout
-
-(defrecord Vertex [label neighbors latitude longitude status distance component]
-)
-\end_layout
-
-\begin_layout Plain Layout
-
-(defrecord Edge [from to weight label])
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Paragraph*
-The edge record structure contains only data supplied by the assignment.
- 
-\end_layout
-
-\begin_layout Subsection
+\begin_layout Subsubsection
 Adding Data
 \end_layout
 
 \begin_layout Paragraph*
-The assignment supplied a list of statements that were meant to use the
- following functions:
+When adding nodes to the open-queue the function 
+\begin_inset Quotes eld
+\end_inset
+
+node-insert!
+\begin_inset Quotes erd
+\end_inset
+
+ is called.
 \end_layout
 
 \begin_layout Paragraph*
@@ -636,53 +451,65 @@ status open
 
 \begin_layout Plain Layout
 
-(defn graph-add-vertex! [graph label latitude longitude]
+(defn node-insert! [tree label value]
 \end_layout
 
 \begin_layout Plain Layout
 
-  (let [hashed-label (hash-label label)]
+  (if (red-black-tree-empty? tree)
 \end_layout
 
 \begin_layout Plain Layout
 
-    (when (not (red-black-hashmap-contains?
+    (dosync
 \end_layout
 
 \begin_layout Plain Layout
 
-				hashed-label (:root @(:vertices graph))))
+      (ref-set (:root tree)
 \end_layout
 
 \begin_layout Plain Layout
 
-      (map-node-insert-helper-2!
+       (make-node! label value Black nil Root)))
 \end_layout
 
 \begin_layout Plain Layout
 
-        (:root @(:vertices graph))
+    (cond
 \end_layout
 
 \begin_layout Plain Layout
 
-        nil         hashed-label
+     (< value @(:value @(:root tree)))
 \end_layout
 
 \begin_layout Plain Layout
 
-        (Vertex.
- label (ref '()) latitude longitude
+        (node-insert-helper! (:left @(:root tree)) (:root tree) label value
+ Left)
 \end_layout
 
 \begin_layout Plain Layout
 
-					(ref unseen) (ref ##Inf) (ref nil))
+      (> value @(:value @(:root tree)))
 \end_layout
 
 \begin_layout Plain Layout
 
-        false))))
+        (node-insert-helper! (:right @(:root tree)) (:root tree) label value
+ Right)
+\end_layout
+
+\begin_layout Plain Layout
+
+      (= value @(:value @(:root tree)))
+\end_layout
+
+\begin_layout Plain Layout
+
+        (node-insert-helper! (:right @(:root tree)) (:root tree) label value
+ Right))))
 \end_layout
 
 \end_inset
@@ -698,49 +525,72 @@ status open
 
 \begin_layout Plain Layout
 
-(defn graph-add-edge! [graph from to label weight]
+(defn node-insert-helper! [node parent label value child]
 \end_layout
 
 \begin_layout Plain Layout
 
-  (let [hashed-edge-key (hash-label (edge-key from to))]
+  (if (tree-node-empty? node)
 \end_layout
 
 \begin_layout Plain Layout
 
-    (when (not (red-black-hashmap-contains? hashed-edge-key (:root @(:edges
- graph)))))
+    (do
 \end_layout
 
 \begin_layout Plain Layout
 
-      (map-node-insert-helper-2!
+      (dosync
 \end_layout
 
 \begin_layout Plain Layout
 
-        (:root @(:edges graph))
+        (ref-set node
 \end_layout
 
 \begin_layout Plain Layout
 
-        nil
+          (make-node! label value Red @parent child)))
 \end_layout
 
 \begin_layout Plain Layout
 
-        hashed-edge-key
+      (red-black-rules-checker! node))
 \end_layout
 
 \begin_layout Plain Layout
 
-        (Edge.
- from to weight label)
+    (cond
 \end_layout
 
 \begin_layout Plain Layout
 
-        true)))
+      (< value @(:value @node))
+\end_layout
+
+\begin_layout Plain Layout
+
+        (node-insert-helper! (:left @node) node label value Left)
+\end_layout
+
+\begin_layout Plain Layout
+
+      (> value @(:value @node))
+\end_layout
+
+\begin_layout Plain Layout
+
+        (node-insert-helper! (:right @node) node label value Right)
+\end_layout
+
+\begin_layout Plain Layout
+
+      (= value @(:value @node))
+\end_layout
+
+\begin_layout Plain Layout
+
+        (node-insert-helper! (:right @node) node label value Right))))
 \end_layout
 
 \end_inset
@@ -749,7 +599,75 @@ status open
 \end_layout
 
 \begin_layout Paragraph*
-These two functions 
+These functions follow the standard procedure for inserting a node into
+ a binary search tree.
+ If the node being inserted is not the root of the red-black tree the 
+\begin_inset Quotes eld
+\end_inset
+
+node-insert-helper!
+\begin_inset Quotes erd
+\end_inset
+
+ function is called and it runs the 
+\begin_inset Quotes eld
+\end_inset
+
+red-black-rules-checker!
+\begin_inset Quotes erd
+\end_inset
+
+ function after the insertion.
+ The 
+\begin_inset Quotes eld
+\end_inset
+
+red-black-rules-checker!
+\begin_inset Quotes erd
+\end_inset
+
+ function checks if the tree is still a red-black tree and performs all
+ neccessary rotations and color changes necessary to balance and restore
+ its state.
+\end_layout
+
+\begin_layout Subsection
+Justification
+\end_layout
+
+\begin_layout Paragraph*
+Using a red-black tree has a number of benefits.
+ Using a list for the open-queue in breadth first search his not optimal.
+ In clojure lists are single-linked which means that the head of the list
+ contains a reference to only the first node and nodes only contain a reference
+ to the next node and not the previous.
+ This means that appending to the list would have a tightly bound linear
+ time complexity O(n)= Ω(n)=Θ(n).
+ Furthermore accessing the node with the lowest value would have a time
+ complexity of O(n) and for the best case scenarion Ω(1), as the list is
+ not sorted.
+\end_layout
+
+\begin_layout Paragraph*
+The red-black tree solves this problem as it is a form of a binary search
+ tree.
+ The tree is sorted and thus accessing the node with the lowest value is
+ as simple as going to the left-most node of the tree.
+ The time complexity of this is tightly bound O(log n)= Ω(log n)=Θ(log n)
+ and the memory complexity is constant.
+ For insertions the time complexity is not tightly bound O(log n) and Ω(1)
+ if the tree is empty.
+ This logarithmic time complexity is due to the maximum height of any red-black
+ tree which is O(log n) thanks to the self balancing nature of the tree.
+ 
+\end_layout
+
+\begin_layout Paragraph*
+It was considered that the entire graph structure could be represented using
+ red-black trees.
+ However, the effieciency of this could not be justified as clojure has
+ a hash map structure that has a near constant time complexity for accessing
+ and inserting nodes.
 \end_layout
 
 \begin_layout Section
@@ -845,8 +763,7 @@ status open
 
 \begin_layout Plain Layout
 
-              (node-insert! rb-queue current-neighbor (inc @(:value @current))))
-)
+              (node-insert! rb-queue current-neighbor (inc @(:value current)))))
 \end_layout
 
 \begin_layout Plain Layout
@@ -879,31 +796,61 @@ open queue
 
  which is a set of vertices that are going to be processed, a set of visited
  or already proccessed vertices and a current vertex.
- The breadth first search is given the finish node which it adds to the
- open queue.
- If the open queue is still populated the algorithm removes next vertex
+ 
+\end_layout
+
+\begin_layout Paragraph*
+The breadth first search is given the finish node which it adds to the open
+ queue along with a value of zero.
+ While the open queue is still populated the algorithm removes next vertex
  from open queue and sets it as current vertex.
- The current vertex's distance value (in its record structure) is set to
- its distance from the finish node.
+ The current vertex's distance value (in the graph's record structure) is
+ set to the value attributed to it in the open queue.
  In this case the distance is the amount of hops (edges) the node is away
  from the finish.
  Finally all adjacent verticies of the current vertex that have an 
 \begin_inset Quotes eld
 \end_inset
 
-unseen status
+unseen
 \begin_inset Quotes erd
 \end_inset
 
- (in ther record structure) are added to the open queue and the current
- vertex's status is set visited.
- The algorithm then choses its next vertex from the open queue and repeats
+ status (in the graph's record structure) are added to the open queue with
+ the increment of the value of the current vertex.
+ The current vertex's status is then set visited.
+ 
+\end_layout
+
+\begin_layout Paragraph*
+The algorithm then choses its next vertex from the open queue and repeats
  the afformentioned steps untill it reaches the start node.
- It is at this point that the algorithm would normally evaluate whether
- or not a path exists between the two nodes however in this implementation
- each vertex has already been marked with an index number corresponding
- to its connected component.
- The algorithm first checks if the two nodes have equal values in the 
+ The breadth first search will iterate through the entire connected component
+ if it does not reach the start node.
+ It is at this point that the 
+\begin_inset Quotes eld
+\end_inset
+
+dijkstra!
+\begin_inset Quotes erd
+\end_inset
+
+ function would normally evaluate whether or not a path exists between the
+ two nodes.
+ However, in this implementation each vertex has already been marked with
+ an index number corresponding to its connected component.
+\end_layout
+
+\begin_layout Paragraph*
+The 
+\begin_inset Quotes eld
+\end_inset
+
+dijkstra!
+\begin_inset Quotes erd
+\end_inset
+
+ function first checks if the two nodes have equal values in the 
 \begin_inset Quotes eld
 \end_inset
 
@@ -911,12 +858,12 @@ component
 \begin_inset Quotes erd
 \end_inset
 
- sections of their records.
+ section of their records.
  If the indicies do not match there exists no path between the two nodes
- and the breadth first search will not run.
- If this feature was not implemented the algorithm would have the itterate
- through the entire connected component before it could assume that there
- exists no path between the two given nodes.
+ and the breadth first search will not be run.
+ If this feature was not implemented the breadth first search algorithm
+ would have the itterate through the entire connected component before it
+ could assume that there exists no path between the two given nodes.
 \end_layout
 
 \begin_layout Standard
@@ -944,7 +891,7 @@ breadth-first-search!
 
 
 \begin_inset Graphics
-	filename /Users/martinjanda/Documents/bfs_flowchart.png
+	filename /Users/martinjanda/Documents/bfs-flow-chart.png
 	scale 75
 
 \end_inset
@@ -1272,46 +1219,6 @@ The above function serves only to call all the helper functions associated
  The time complexity of this operation is tightly bound and linear O(n)=
  Ω(n)=Θ(n) as it must iterate through each and every node of the red-black
  tree of vertices.
- The memory complexity of this varys throughout each iteration of the algorithm
- and is roughly equal to the width of the tree at the depth of the corresponding
- iteration this means it is tightly bound O(2
-\begin_inset script superscript
-
-\begin_layout Plain Layout
-i
-\end_layout
-
-\end_inset
-
-)= Ω(2
-\begin_inset script superscript
-
-\begin_layout Plain Layout
-i
-\end_layout
-
-\end_inset
-
-)=Θ(2
-\begin_inset script superscript
-
-\begin_layout Plain Layout
-i
-\end_layout
-
-\end_inset
-
-), where 
-\begin_inset Quotes eld
-\end_inset
-
-i
-\begin_inset Quotes erd
-\end_inset
-
- is the index of the iteration starting at 0.
- This is however a rough estimate and may vary for leaf nodes as red-black
- trees stay within 1 node difference of maximum and minimum depth.
 \end_layout
 
 \begin_layout Paragraph*
@@ -1320,12 +1227,9 @@ Next the function checks if the start and finish vertices are part of the
  If they are, the function continues otherwise the function terminates without
  entering the marking phase as there exists no path between two nodes that
  are not part of the same connected component.
- The time complexity of this operation is O(log n) or Ω(1) and is not tightly
- bound because all that is happening is the lookup of two nodes within the
- graph's red-black tree structure which contains the set of vertices.
- The memory complexity is tightly bound and constant O(1)= Ω(1)=Θ(1) as
- only one node is being accessed at a time while searching for the specified
- node.
+ The time complexity of this operation is nearly constant because all that
+ is happening is the lookup of two nodes within the graph's hash map structure
+ which contains the set of vertices.
 \end_layout
 
 \begin_layout Paragraph*
@@ -1334,6 +1238,48 @@ If the condition is satisfied the function will call the marking stage which
  Once the marking stage completes the function runs the trace back algorithm
  and terminates.
  
+\end_layout
+
+\begin_layout Subsection
+Efficiency and Justification
+\end_layout
+
+\begin_layout Paragraph*
+Aside from possible micro-optimizations this is the most efficient way to
+ find the shortest path between two point on a graph.
+ This algorithm has been chosen simply because there is no other algorithm
+ to find the shortest path between two points in an unweighted graph.
+\end_layout
+
+\begin_layout Paragraph*
+Several optimizations have already been added to this implementation.
+ The worst case scenario for naive Dijkstra's algorithm occurs when there
+ exists no path between the vertices supplied.
+ With this implementation if the API gets more than 
+\begin_inset Quotes eld
+\end_inset
+
+x
+\begin_inset Quotes erd
+\end_inset
+
+ (where 
+\begin_inset Quotes eld
+\end_inset
+
+x
+\begin_inset Quotes erd
+\end_inset
+
+ is the amount of connected components) requests for nonexistent paths it
+ will be more efficient.
+ This is because the connected components are counted and marked after the
+ entire graph has been recorded.
+ The open-queue has also been optimized using a red black tree.
+\end_layout
+
+\begin_layout Section
+Finding the Shortest Path With Edge Weights
 \end_layout
 
 \end_body
