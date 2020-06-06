@@ -38,6 +38,9 @@
 (defn color-of-uncle [node]
   @(:color @(get-uncle node)))
 
+(defn get-parent [node]
+  @(:parent node))
+
 (defn color-of-parent [node]
   @(:color @(:parent @node)))
 ;;;;;;;;;;;;;;;;;;;;;;;;;; Basics for Graph ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -247,7 +250,7 @@
               @(:right @node))
             (ref-set
               (:child @(:root rb-queue))
-              Right)
+              Root)
             (ref-set
               (:parent @(:root rb-queue))
               nil)))
@@ -260,21 +263,21 @@
 ;;;;Reseting the distance and status of every vertex;;;
 
 (defn graph-reset! [graph]
-  (graph-reset-helper! ))
+  nil)
 ;;;;Reseting the distance and status of every vertex;;;
 
 ;;;;Status of vertex;;;;
 (defn vertex-unseen? [graph label]
-  (= @(:status @(get @(:vertices graph) label)) unseen)
+  (= @(:status (get @(:vertices graph) label)) unseen))
 
-(defn vertex-current? [node]
-  (= @(:status @(get @(:vertices graph) label)) current)
+(defn vertex-current? [graph label]
+  (= @(:status (get @(:vertices graph) label)) current))
 
-(defn vertex-in-queue? [node]
-  (= @(:status @(get @(:vertices graph) label)) in-queue)
+(defn vertex-in-queue? [graph label]
+  (= @(:status (get @(:vertices graph) label)) in-queue))
 
-(defn vertex-visited? [node]
-  (= @(:status @(get @(:vertices graph) label)) visited)
+(defn vertex-visited? [graph label]
+  (= @(:status (get @(:vertices graph) label)) visited))
 ;;;;Status of vertex;;;;
 
 ;;;;BFS Dijkstra;;;;
@@ -376,13 +379,13 @@
     (let [current (pick-least-node (:root rb-queue))]
       (remove-least-node! (:root rb-queue))
       (dosync
-        (ref-set (:distance @(get-vertex graph (:label current)))
+        (ref-set (:distance (get-vertex graph (:label current)))
                   @(:value current)))
       (when (not (= (:label current) start))
         (loop [neighbors
-              @(:neighbors @(get-vertex graph (:label current)))]
+              @(:neighbors (get-vertex graph (:label current)))]
           (let [current-neighbor (first neighbors)]
-            (when (get-vertex-unseen? graph current-neighbor)
+            (when (vertex-unseen? graph current-neighbor)
               (node-insert! rb-queue current-neighbor (inc @(:value current)))))
           (recur (rest neighbors)))))
     (recur))))
@@ -400,3 +403,67 @@
 ;;;;;;;;A*;;;;;;;;;;;
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;A* Algorithm ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(defn print-tree [node]
+  (when (not (tree-node-empty? node))
+    (println "Label: " (:label @node))
+    (println "Value: " @(:value @node))
+    (if (= @(:color @node) Black)
+      (println "Color: Black")
+      (println "Color: Red"))
+    (if (= @(:child @node) Left)
+      (println "Child: Left")
+      (if (= @(:child @node) Root)
+        (println "Child: Root")
+        (println "Child: Right")))
+    (println "=======================")
+    (print-tree (:left @node))
+    (print-tree (:right @node))))
+
+(defn print-queue [] (print-tree (:root rb-queue)))
+
+(defn rb-node->str-single [l n]
+  (if (nil? n)
+    (str l ":-")
+    (str
+     "\u001b["
+     (if (= @(:color n) Black)
+       "0;100"
+       "0;41")
+     "m" l ":"
+     (:label n)
+     "\u001b[0m")))
+
+(defn rb-node->str [n]
+  (str "["
+       (rb-node->str-single "k" n)
+       "|"
+       (rb-node->str-single "p" @(:parent n))
+       ","
+       (rb-node->str-single "l" @(:left n))
+       ","
+       (rb-node->str-single "r" @(:right n))
+       "]"))
+
+
+(defn rb-node-print-tree [node prefix firstprefix]
+  (when (not (nil? @node))
+    ;;(println (str firstprefix @(:key @node) " => " ))
+    (println (str firstprefix (rb-node->str @node)))
+    (rb-node-print-tree (:left @node)
+                          (if (not (nil? @(:right @node)))
+                            (str prefix "│   ")
+                            (str prefix "    "))
+                          (str prefix
+                               (if (not (nil? @(:right @node)))
+                                 "├"
+                                 "└")
+                               "─ [L] "))
+    (rb-node-print-tree (:right @node)
+                          (str prefix "    ")
+                          (str prefix "└─ [R] "))))
+
+
+(defn rb-print-tree [tree]
+  (if (nil? @(:root tree))
+    (println "Empty tree!")
+    (rb-node-print-tree (:root tree) " " "[/] ")))
