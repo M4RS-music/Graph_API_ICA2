@@ -263,7 +263,10 @@
 ;;;;Reseting the distance and status of every vertex;;;
 
 (defn graph-reset! [graph]
-  nil)
+  (doseq [v (vals @(:vertices graph))]
+    (dosync
+      (ref-set (:status v) unseen)
+      (ref-set (:distance v) ##Inf))))
 ;;;;Reseting the distance and status of every vertex;;;
 
 ;;;;Status of vertex;;;;
@@ -403,6 +406,44 @@
 ;;;;;;;;A*;;;;;;;;;;;
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;A* Algorithm ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;Count Components;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(defn breadth-first-search-connected-components! [graph start index]
+  (node-insert! rb-queue start index)
+  (loop []
+    (when (not (red-black-tree-empty? rb-queue))
+    (let [current (pick-least-node (:root rb-queue))]
+      (remove-least-node! (:root rb-queue))
+      (dosync
+        (ref-set (:component (get-vertex graph (:label current)))
+                  @(:value current)))
+      (loop [neighbors
+            @(:neighbors (get-vertex graph (:label current)))]
+        (let [current-neighbor (first neighbors)]
+          (when (vertex-unseen? graph current-neighbor)
+            (node-insert! rb-queue current-neighbor index)))
+        (recur (rest neighbors))))
+      (dosync
+        (ref-set (:status (get-vertex graph (:label current))) visited))
+    (recur))))
+
+(defn remaining-unseen [graph]
+  (loop [v (vals @(:vertices graph))]
+    (let [current (first v)]
+      (if (= @(:status current) unseen)
+        (:label current)
+        (recur (rest v))))))
+
+(defn index-components! [graph]
+  (graph-reset! graph)
+  (loop [index 0]
+    (breadth-first-search-connected-components! graph
+                                                (remaining-unseen graph)
+                                                index)
+    (recur (inc index))))
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;Count Components;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;Debugigng;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defn print-tree [node]
   (when (not (tree-node-empty? node))
     (println "Label: " (:label @node))

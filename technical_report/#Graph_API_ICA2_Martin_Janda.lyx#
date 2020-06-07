@@ -671,6 +671,199 @@ It was considered that the entire graph structure could be represented using
 \end_layout
 
 \begin_layout Section
+Indexing Connected Components
+\end_layout
+
+\begin_layout Paragraph*
+In each vertice's record structure is as 
+\begin_inset Quotes eld
+\end_inset
+
+component
+\begin_inset Quotes erd
+\end_inset
+
+ value.
+ This value is used to tell whether any two vertices are part of the same
+ component.
+ This prevents algorithms like Dijkstra's algorithm from having to iterate
+ through an entire connected component if there exists no path between the
+ start and finish vertex.
+ The result of this is used to prove there exists no path between two vertices
+ (in this code 
+\begin_inset Quotes eld
+\end_inset
+
+Palmero
+\begin_inset Quotes erd
+\end_inset
+
+ and 
+\begin_inset Quotes eld
+\end_inset
+
+Prague
+\begin_inset Quotes erd
+\end_inset
+
+).
+ Below is the breadth first search algorithm it uses.
+\end_layout
+
+\begin_layout Paragraph
+lyx is shit
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+lstparams "language=Lisp,numbers=left,basicstyle={\ttfamily},tabsize=3"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+(defn breadth-first-search-connected-components! [graph start index]   (node-ins
+ert! rb-queue start index)   (loop []     (when (not (red-black-tree-empty?
+ rb-queue))     (let [current (pick-least-node (:root rb-queue))]      
+ (remove-least-node! (:root rb-queue))       (dosync         (ref-set (:componen
+t (get-vertex graph (:label current)))                   @(:value current)))
+       (loop [neighbors             @(:neighbors (get-vertex graph (:label
+ current)))]         (let [current-neighbor (first neighbors)]         
+  (when (vertex-unseen? graph current-neighbor)             (node-insert!
+ rb-queue current-neighbor index)))         (recur (rest neighbors)))) 
+      (dosync         (ref-set (:status (get-vertex graph (:label current)))
+ visited))     (recur))))
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Paragraph*
+The 
+\begin_inset Quotes eld
+\end_inset
+
+breadth-first-search-connected-components!
+\begin_inset Quotes erd
+\end_inset
+
+ function accepts 3 arguments graph, start and index.
+ The function iterates through the entire connected component of the start
+ vertex.
+ First the algorithm adds the start vertex to the open-queue.
+ While the queue is not empty it adds the left-most node of the red-black
+ tree open-queue as the current vertex.
+ Then the function sets the component value of the vertex equal to the index
+ value passed to the function.
+ Finally it adds all the unseen neigbors of the current vertex to the open-queue
+, sets the status of the current vertex to visited and recurs to the stage
+ of checking whether the open-queue is empty.
+ This function is called by the main indexing function below.
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+lstparams "language=Lisp,numbers=left,basicstyle={\ttfamily},tabsize=3"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+(defn index-components! [graph]
+\end_layout
+
+\begin_layout Plain Layout
+
+  (graph-reset! graph)
+\end_layout
+
+\begin_layout Plain Layout
+
+  (loop [index 0]
+\end_layout
+
+\begin_layout Plain Layout
+
+    (breadth-first-search-connected-components! graph
+\end_layout
+
+\begin_layout Plain Layout
+
+                                                (remaining-unseen graph)
+\end_layout
+
+\begin_layout Plain Layout
+
+                                                index)
+\end_layout
+
+\begin_layout Plain Layout
+
+    (recur (inc index))))
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Paragraph*
+The 
+\begin_inset Quotes eld
+\end_inset
+
+index-components!
+\begin_inset Quotes erd
+\end_inset
+
+ function is a simple tail recursive loop that keeps track of the index
+ value that is going to be passed to the breadth first search.
+ First the status and distance values of the graph are reset.
+ Then the loop calls the 
+\begin_inset Quotes eld
+\end_inset
+
+breadth-first-search-connected-components!
+\begin_inset Quotes erd
+\end_inset
+
+ using the first 
+\begin_inset Quotes eld
+\end_inset
+
+unseen
+\begin_inset Quotes erd
+\end_inset
+
+ vertex it finds as the start vertex.
+ The loop recurs with the increment of the index and runs again.
+ The loop fails when it can no longer find an 
+\begin_inset Quotes eld
+\end_inset
+
+unseen
+\begin_inset Quotes erd
+\end_inset
+
+ vertex in the graph.
+\end_layout
+
+\begin_layout Paragraph*
+The time complexity of this function is tightly bound and linear O(n)= Ω(n)=Θ(n)
+ as the breadth first search will iterate through the entire graph before
+ the loop ends.
+ The memory complexity of this function is tightly bound and constant O(1)=
+ Ω(1)=Θ(1) as it only keeps track a set amount of nodes at a time.
+ This is theoretically the only way to label the connected components of
+ a graph as regardless of the traversing function the entire set of vertices
+ must be iterated through.
+ Thanks to this being run after all the data has been added to the graph,
+ the time complexity of 
+\end_layout
+
+\begin_layout Section
 Dijkstra's Algorithm Without Edge Weights
 \end_layout
 
