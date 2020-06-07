@@ -111,7 +111,7 @@ ICA2
 \end_layout
 
 \begin_layout Paragraph*
-1971 Words
+3266 Words
 \end_layout
 
 \begin_layout Paragraph*
@@ -227,13 +227,13 @@ Aim
 \end_layout
 
 \begin_layout Paragraph*
-The aim of the assignment was to describe the implementation of the algorithms
- specified by the assignment brief.
- This technical report also adresses the graph and helper structures that
+The aim of this assignment is to describe the most efficient implementation
+ of the algorithms specified by the assignment brief.
+ This technical report also addresses the graph and helper structures that
  have been implemented as they are a large part of the code being submitted
  and contribute directly to the efficiency of the algorithms.
- All code in this doccument was written by the author in Clojure a list
- proccessing programming language.
+ All code in this document was written by the author in Clojure a list processin
+g programming language.
 \end_layout
 
 \begin_layout Section
@@ -319,6 +319,25 @@ value
 \begin_inset Quotes eld
 \end_inset
 
+value2
+\begin_inset Quotes erd
+\end_inset
+
+: the second value used to store distance from finish when 
+\begin_inset Quotes eld
+\end_inset
+
+value
+\begin_inset Quotes erd
+\end_inset
+
+ is used for great circle distance in A*.
+\end_layout
+
+\begin_layout Itemize
+\begin_inset Quotes eld
+\end_inset
+
 color
 \begin_inset Quotes erd
 \end_inset
@@ -384,7 +403,7 @@ status open
 
 \begin_layout Plain Layout
 
-(defrecord Red-Black-Node [label value color left right parent child])
+(defrecord Red-Black-Node [label value value2 color left right parent child])
 \end_layout
 
 \end_inset
@@ -627,7 +646,7 @@ red-black-rules-checker!
 \end_inset
 
  function checks if the tree is still a red-black tree and performs all
- neccessary rotations and color changes necessary to balance and restore
+ necessary rotations and color changes necessary to balance and restore
  its state.
 \end_layout
 
@@ -638,13 +657,13 @@ Justification
 \begin_layout Paragraph*
 Using a red-black tree has a number of benefits.
  Using a list for the open-queue in breadth first search his not optimal.
- In clojure lists are single-linked which means that the head of the list
+ In Clojure lists are single-linked which means that the head of the list
  contains a reference to only the first node and nodes only contain a reference
  to the next node and not the previous.
  This means that appending to the list would have a tightly bound linear
  time complexity O(n)= Ω(n)=Θ(n).
  Furthermore accessing the node with the lowest value would have a time
- complexity of O(n) and for the best case scenarion Ω(1), as the list is
+ complexity of O(n) and for the best case scenario Ω(1), as the list is
  not sorted.
 \end_layout
 
@@ -665,8 +684,8 @@ The red-black tree solves this problem as it is a form of a binary search
 \begin_layout Paragraph*
 It was considered that the entire graph structure could be represented using
  red-black trees.
- However, the effieciency of this could not be justified as clojure has
- a hash map structure that has a near constant time complexity for accessing
+ However, the efficiency of this could not be justified as Clojure has a
+ hash map structure that has a near constant time complexity for accessing
  and inserting nodes.
 \end_layout
 
@@ -675,7 +694,7 @@ Indexing Connected Components
 \end_layout
 
 \begin_layout Paragraph*
-In each vertice's record structure is as 
+In each vertex record structure is as 
 \begin_inset Quotes eld
 \end_inset
 
@@ -707,7 +726,7 @@ Prague
 \end_inset
 
 ).
- Below is the breadth first search algorithm it uses.
+ Below are the functions involved.
 \end_layout
 
 \begin_layout Paragraph
@@ -723,15 +742,15 @@ status open
 \begin_layout Plain Layout
 
 (defn breadth-first-search-connected-components! [graph start index]   (node-ins
-ert! rb-queue start index)   (loop []     (when (not (red-black-tree-empty?
+ert! rb-queue start index nil)   (loop []     (when (not (red-black-tree-empty?
  rb-queue))     (let [current (pick-least-node (:root rb-queue))]      
  (remove-least-node! (:root rb-queue))       (dosync         (ref-set (:componen
 t (get-vertex graph (:label current)))                   @(:value current)))
        (loop [neighbors             @(:neighbors (get-vertex graph (:label
  current)))]         (let [current-neighbor (first neighbors)]         
   (when (vertex-unseen? graph current-neighbor)             (node-insert!
- rb-queue current-neighbor index)))         (recur (rest neighbors)))) 
-      (dosync         (ref-set (:status (get-vertex graph (:label current)))
+ rb-queue current-neighbor index nil)))         (recur (rest neighbors))))
+       (dosync         (ref-set (:status (get-vertex graph (:label current)))
  visited))     (recur))))
 \end_layout
 
@@ -753,14 +772,18 @@ breadth-first-search-connected-components!
  The function iterates through the entire connected component of the start
  vertex.
  First the algorithm adds the start vertex to the open-queue.
- While the queue is not empty it adds the left-most node of the red-black
+ While the queue is not empty it sets the left-most node of the red-black
  tree open-queue as the current vertex.
  Then the function sets the component value of the vertex equal to the index
  value passed to the function.
- Finally it adds all the unseen neigbors of the current vertex to the open-queue
-, sets the status of the current vertex to visited and recurs to the stage
+ Finally it adds all the unseen neighbors of the current vertex to the open-queu
+e, sets the status of the current vertex to visited and recurs to the stage
  of checking whether the open-queue is empty.
  This function is called by the main indexing function below.
+\end_layout
+
+\begin_layout Paragraph
+lyx is shit
 \end_layout
 
 \begin_layout Standard
@@ -855,13 +878,13 @@ The time complexity of this function is tightly bound and linear O(n)= Ω(n)=Θ(
  as the breadth first search will iterate through the entire graph before
  the loop ends.
  The memory complexity of this function is tightly bound and constant O(1)=
- Ω(1)=Θ(1) as it only keeps track a set amount of nodes at a time.
+ Ω(1)=Θ(1) as it only keeps track of a set amount of nodes at a time.
  This is theoretically the only way to label the connected components of
  a graph as regardless of the traversing function the entire set of vertices
  must be iterated through.
  Thanks to this being run after all the data has been added to the graph,
  the time complexity of proving there exists no path between two vertices
- is near constant thanks to Clojure's hash maps.
+ is near constant due to Clojure's hash maps.
 \end_layout
 
 \begin_layout Section
@@ -876,7 +899,7 @@ This section describes the implementation of Dijkstra's algorithm, Dijkstra's
 \end_layout
 
 \begin_layout Subsection
-Breadth First Search Algorithm
+Breadth First Search Function
 \end_layout
 
 \begin_layout Standard
@@ -888,16 +911,17 @@ status open
 \begin_layout Plain Layout
 
 (defn breadth-first-search-dijkstra! [graph start finish]   (node-insert!
- rb-queue finish 0)   (loop []     (when (not (red-black-tree-empty? rb-queue))
-     (let [current (pick-least-node (:root rb-queue))]       (remove-least-node!
- (:root rb-queue))       (dosync         (ref-set (:distance (get-vertex
- graph (:label current)))                   @(:value current)))       (when
- (not (= (:label current) start))         (loop [neighbors             
-  @(:neighbors (get-vertex graph (:label current)))]           (let [current-nei
-ghbor (first neighbors)]             (when (vertex-unseen? graph current-neighbo
-r)               (node-insert! rb-queue current-neighbor (inc @(:value current))
-)))           (recur (rest neighbors)))))       (dosync         (ref-set
- (:status (get-vertex graph (:label current))) visited))     (recur))))
+ rb-queue finish 0 nil)   (loop []     (when (not (red-black-tree-empty?
+ rb-queue))     (let [current (pick-least-node (:root rb-queue))]      
+ (remove-least-node! (:root rb-queue))       (dosync         (ref-set (:distance
+ (get-vertex graph (:label current)))                   @(:value current)))
+       (when (not (= (:label current) start))         (loop [neighbors 
+              @(:neighbors (get-vertex graph (:label current)))]       
+    (let [current-neighbor (first neighbors)]             (when (vertex-unseen?
+ graph current-neighbor)               (node-insert! rb-queue current-neighbor
+ (inc @(:value current)) nil)))           (recur (rest neighbors)))))  
+     (dosync         (ref-set (:status (get-vertex graph (:label current)))
+ visited))     (recur))))
 \end_layout
 
 \end_inset
@@ -919,7 +943,7 @@ open queue
 \end_inset
 
  which is a set of vertices that are going to be processed, a set of visited
- or already proccessed vertices and a current vertex.
+ or already processed vertices and a current vertex.
  
 \end_layout
 
@@ -932,7 +956,7 @@ The breadth first search is given the finish node which it adds to the open
  set to the value attributed to it in the open queue.
  In this case the distance is the amount of hops (edges) the node is away
  from the finish.
- Finally all adjacent verticies of the current vertex that have an 
+ Finally all adjacent vertices of the current vertex that have an 
 \begin_inset Quotes eld
 \end_inset
 
@@ -948,7 +972,7 @@ unseen
 
 \begin_layout Paragraph*
 The algorithm then choses its next vertex from the open queue and repeats
- the afformentioned steps untill it reaches the start node.
+ the aforementioned steps until it reaches the start node.
  The breadth first search will iterate through the entire connected component
  if it does not reach the start node.
  It is at this point that the 
@@ -983,10 +1007,10 @@ component
 \end_inset
 
  section of their records.
- If the indicies do not match there exists no path between the two nodes
+ If the indices do not match there exists no path between the two nodes
  and the breadth first search will not be run.
  If this feature was not implemented the breadth first search algorithm
- would have the itterate through the entire connected component before it
+ would have the iterate through the entire connected component before it
  could assume that there exists no path between the two given nodes.
 \end_layout
 
@@ -1086,7 +1110,7 @@ Flowchart for
 \begin_inset Quotes eld
 \end_inset
 
-dijksta-trace-back
+dijkstra-trace-back
 \begin_inset Quotes erd
 \end_inset
 
@@ -1218,10 +1242,10 @@ status open
 \end_layout
 
 \begin_layout Paragraph*
-Chosing the neighbor with the lowest distance to finish (without edge weights)
+Choosing the neighbor with the lowest distance to finish (without edge weights)
  is as simple as iterating through all the neighbors and keeping track of
  the lowest distance value over iterations.
- The above function acomplishes exactly that and returns the label of the
+ The above function accomplishes exactly that and returns the label of the
  neighbor with the lowest distance to finish.
  The time complexity of this function is tightly bound and linear O(n)=
  Ω(n)=Θ(n) where 
@@ -1236,7 +1260,7 @@ n
  This is because the distance each neighbor must be checked once to find
  the neighbor with the lowest value.
  The memory complexity of this function is not tightly bound O(n) Ω(1) as
- all of the neighbors must be stored in the loop at the beggining and one
+ all of the neighbors must be stored in the loop at the beginning and one
  less is kept track off on each iteration.
 \end_layout
 
@@ -1408,12 +1432,12 @@ Finding the Shortest Path With Edge Weights
 
 \begin_layout Paragraph*
 This section discusses algorithms for finding the shortest path between
- two verticies in a weighted graph.
+ two vertices in a weighted graph.
  
 \end_layout
 
 \begin_layout Subsection
-Breadth First Search Weighted Algorithm
+Breadth First Search for A* Function
 \end_layout
 
 \begin_layout Standard
@@ -1424,12 +1448,384 @@ status open
 
 \begin_layout Plain Layout
 
-(defrecord Graph [vertices edges])
+(defn breadth-first-search-a*! [graph start finish]   (node-insert! rb-queue
+ finish (great-circle-distance graph finish start) 0)   (loop []     (when
+ (not (red-black-tree-empty? rb-queue))     (let [current (pick-least-node
+ (:root rb-queue) start)]       (remove-least-node! (:root rb-queue))  
+     (dosync         (ref-set (:distance (get-vertex graph (:label current)))
+                  @(:value2 current)))       (when (not (= (:label current)
+ start))         (loop [neighbors               @(:neighbors (get-vertex
+ graph (:label current)))]           (let [current-neighbor (first neighbors)
+                 edge-distance (:distance (get-edge graph              
+                                      current-neighbor                 
+                                   (:label current)))                 great-circ
+le (great-circle-distance graph                                        
+             current-neighbor                                          
+           start)]             (when (vertex-unseen? graph current-neighbor)
+               (node-insert! rb-queue current-neighbor                 
+            great-circle                             (+ @(:value current)
+ edge-distance))))           (recur (rest neighbors)))))     (recur))))
 \end_layout
 
 \end_inset
 
 
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+Flowchart for 
+\begin_inset Quotes eld
+\end_inset
+
+breadth-first-search-a*!
+\begin_inset Quotes erd
+\end_inset
+
+ Function
+\end_layout
+
+\end_inset
+
+
+\begin_inset Graphics
+	filename /Users/martinjanda/Documents/weighted-flow-chart.png
+	scale 75
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Paragraph*
+The 
+\begin_inset Quotes eld
+\end_inset
+
+breadth-first-search-a*!
+\begin_inset Quotes erd
+\end_inset
+
+ function follows the same steps as any other breadth first search except
+ it uses the great-circle distance of the vertex to the start to pick the
+ next vertex to the open-queue.
+ This is accomplished by storing the great-circle distance in the 
+\begin_inset Quotes eld
+\end_inset
+
+value
+\begin_inset Quotes erd
+\end_inset
+
+ section of the red-black tree nodes record, the edge weight distance is
+ stored in 
+\begin_inset Quotes eld
+\end_inset
+
+value2
+\begin_inset Quotes erd
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Subsection
+Weighted Trace Back Function for A*
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+lstparams "language=Lisp,numbers=left,basicstyle={\ttfamily},tabsize=1"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+(defn weighted-trace-back [graph start finish]
+\end_layout
+
+\begin_layout Plain Layout
+
+  (loop [current start]
+\end_layout
+
+\begin_layout Plain Layout
+
+    (println current)
+\end_layout
+
+\begin_layout Plain Layout
+
+    (when (not (= current finish))
+\end_layout
+
+\begin_layout Plain Layout
+
+      (recur (weighted-trace-back-pick-best current)))))
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+Flowchart for 
+\begin_inset Quotes eld
+\end_inset
+
+wighted-trace-back
+\begin_inset Quotes erd
+\end_inset
+
+ Function
+\end_layout
+
+\end_inset
+
+
+\begin_inset Graphics
+	filename /Users/martinjanda/Desktop/Screen Shot 2020-06-07 at 10.02.17 AM.png
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Paragraph*
+After the marking stage of A* algorithm has finished the 
+\begin_inset Quotes eld
+\end_inset
+
+weighted-trace-back
+\begin_inset Quotes erd
+\end_inset
+
+ function is run.
+ This function is capable of tracing the shortest path marked by both A*
+ are Dijkstra with weights.
+ Like its unweighted counterpart it accepts three arguments graph, start
+ and finish.
+ The function follows the exact same steps as its unweighted counterpart
+ as well, the only difference is the function it uses to find the neighbor
+ with the lowest value.
+\end_layout
+
+\begin_layout Subsubsection
+Picking the Valid Neighbor With the Lowest Distance to Finish
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+lstparams "language=Lisp,numbers=left,basicstyle={\ttfamily},tabsize=1"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+(defn weighted-trace-back-pick-best [graph vertex]
+\end_layout
+
+\begin_layout Plain Layout
+
+  (loop [neighbors @(:neighbors @(get-vertex graph vertex))
+\end_layout
+
+\begin_layout Plain Layout
+
+         best-distance ##Inf
+\end_layout
+
+\begin_layout Plain Layout
+
+         best-label nil]
+\end_layout
+
+\begin_layout Plain Layout
+
+    (if (= (count neighbors) 1)
+\end_layout
+
+\begin_layout Plain Layout
+
+      (if (and
+\end_layout
+
+\begin_layout Plain Layout
+
+            (< @(:distance @(get-vertex graph (first neighbors))) best-distance)
+\end_layout
+
+\begin_layout Plain Layout
+
+            (= (- @(:distance @(get-vertex graph vertex))
+\end_layout
+
+\begin_layout Plain Layout
+
+                  @(:distance @(get-vertex graph (first neighbors))))
+\end_layout
+
+\begin_layout Plain Layout
+
+              (:weight @(get-edge graph (first neighbors) vertex))))
+\end_layout
+
+\begin_layout Plain Layout
+
+        (first neighbors)
+\end_layout
+
+\begin_layout Plain Layout
+
+        best-label)
+\end_layout
+
+\begin_layout Plain Layout
+
+      (if (and
+\end_layout
+
+\begin_layout Plain Layout
+
+            (< @(:distance @(get-vertex graph (first neighbors))) best-distance)
+\end_layout
+
+\begin_layout Plain Layout
+
+            (= (- @(:distance @(get-vertex graph vertex))
+\end_layout
+
+\begin_layout Plain Layout
+
+                  @(:distance @(get-vertex graph (first neighbors))))
+\end_layout
+
+\begin_layout Plain Layout
+
+              (:weight @(get-edge graph (first neighbors) vertex))))
+\end_layout
+
+\begin_layout Plain Layout
+
+        (recur (rest neighbors)
+\end_layout
+
+\begin_layout Plain Layout
+
+               @(:distance @(get-vertex graph (first neighbors)))
+\end_layout
+
+\begin_layout Plain Layout
+
+               (first neighbors))
+\end_layout
+
+\begin_layout Plain Layout
+
+        (recur (rest neighbors)
+\end_layout
+
+\begin_layout Plain Layout
+
+                best-distance
+\end_layout
+
+\begin_layout Plain Layout
+
+                best-label)))))
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Paragraph*
+In order to choose the neighbor with the lowest distance to finish this
+ function must also validate that the distance of this vertex is correct.
+ This is due to the nature of the marking stage of A*.
+ The 
+\begin_inset Quotes eld
+\end_inset
+
+weighted-trace-back-pick-best
+\begin_inset Quotes erd
+\end_inset
+
+ function follows the same steps as the 
+\begin_inset Quotes eld
+\end_inset
+
+dijkstra-trace-back-pick-best
+\begin_inset Quotes erd
+\end_inset
+
+ function save for one detail.
+ When deciding if a neighbor has a lower distance than the current distance
+ the function checks if difference between the distance values of the neighbor
+ and the vertex is equal to weight of the edge connecting them.
+ If the previous condition is true and the distance is lower than the best
+ distance the function either recurs with or returns the label of the neighbor
+ being evaluated.
+\end_layout
+
+\begin_layout Subsection
+A* Function
+\end_layout
+
+\begin_layout Subsection
+Efficiency and Justification
+\end_layout
+
+\begin_layout Section
+Conclusion
+\end_layout
+
+\begin_layout Paragraph*
+In general the subject of graph-related algorithms is an extremely nuanced
+ part of mathematics in computing.
+ There are countless real world applications, even for the algorithms discussed
+ in this document (networking, GPS Navigation, logistics).
+ The authors goal when writing this code was to write the most efficient
+ versions of these algorithms within his capabilities.
+ However, this is in no way a claim that there aren't any improvements to
+ be made.
+ With higher level functions such as this there are so many variables to
+ change and optimize (data structure, helper functions) and due to this
+ there is always some angle that has not been considered.
+ It is the driving force behind competition and improvement in software
+ over the years.
+ What this assignment did accomplish was the delivery of a clear competent
+ explanation of the given algorithms and a justification for the improvements
+ that have been made.
 \end_layout
 
 \end_body

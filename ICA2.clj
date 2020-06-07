@@ -1,7 +1,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;; Basics for Red Black Queue ;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defrecord Red-Black-Tree [root])
-(defrecord Red-Black-Node [label value color left right parent child])
+(defrecord Red-Black-Node [label value value2 color left right parent child])
 
 (def ^:const Black 4)
 (def ^:const Red 5)
@@ -10,7 +10,7 @@
 (def ^:const Root 8)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;Helper Functions;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(defn make-nil-node [child] (Red-Black-Node. nil (ref nil) (ref Black)
+(defn make-nil-node [child] (Red-Black-Node. nil (ref nil) (ref nil) (ref Black)
                                             (ref nil) (ref nil) (ref nil)
                                             (ref child)))
 
@@ -21,8 +21,8 @@
 (defn tree-node-empty? [node] (nil? (:label @node)))
 (defn red-black-tree-empty? [tree] (tree-node-empty? (:root tree)))
 
-(defn make-node! [label value color parent child]
-  (Red-Black-Node. label (ref value) (ref color)
+(defn make-node! [label value value2 color parent child]
+  (Red-Black-Node. label (ref value) (ref value2) (ref color)
                   (ref (make-nil-node Left)) (ref (make-nil-node Right))
                   (ref parent) (ref child)))
 
@@ -200,33 +200,33 @@
         (red-parent-black-uncle-checker! node)))))
 ;;;;;;;;;;;;;;;;;;;;;;; Queue Related Insertion ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(defn node-insert-helper! [node parent label value child]
+(defn node-insert-helper! [node parent label value value2 child]
   (if (tree-node-empty? node)
     (do
       (dosync
         (ref-set node
-          (make-node! label value Red @parent child)))
+          (make-node! label value value2 Red @parent child)))
       (red-black-rules-checker! node))
     (cond
       (< value @(:value @node))
-        (node-insert-helper! (:left @node) node label value Left)
+        (node-insert-helper! (:left @node) node label value value2 Left)
       (> value @(:value @node))
-        (node-insert-helper! (:right @node) node label value Right)
+        (node-insert-helper! (:right @node) node label value value2 Right)
       (= value @(:value @node))
-        (node-insert-helper! (:right @node) node label value Right))))
+        (node-insert-helper! (:right @node) node label value value2 Right))))
 
-(defn node-insert! [tree label value]
+(defn node-insert! [tree label value value2]
   (if (red-black-tree-empty? tree)
     (dosync
       (ref-set (:root tree)
-        (make-node! label value Black nil Root)))
+        (make-node! label value value2 Black nil Root)))
     (cond
       (< value @(:value @(:root tree)))
-        (node-insert-helper! (:left @(:root tree)) (:root tree) label value Left)
+        (node-insert-helper! (:left @(:root tree)) (:root tree) label value value2 Left)
       (> value @(:value @(:root tree)))
-        (node-insert-helper! (:right @(:root tree)) (:root tree) label value Right)
+        (node-insert-helper! (:right @(:root tree)) (:root tree) label value value2 Right)
       (= value @(:value @(:root tree)))
-        (node-insert-helper! (:right @(:root tree)) (:root tree) label value Right))))
+        (node-insert-helper! (:right @(:root tree)) (:root tree) label value value2 Right))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Queue Operations ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -285,7 +285,7 @@
 
 ;;;;BFS Dijkstra;;;;
 (defn breadth-first-search-dijkstra! [graph start finish]
-  (node-insert! rb-queue finish 0)
+  (node-insert! rb-queue finish 0 nil)
   (loop []
     (when (not (red-black-tree-empty? rb-queue))
     (let [current (pick-least-node (:root rb-queue))]
@@ -298,7 +298,7 @@
               @(:neighbors (get-vertex graph (:label current)))]
           (let [current-neighbor (first neighbors)]
             (when (vertex-unseen? graph current-neighbor)
-              (node-insert! rb-queue current-neighbor (inc @(:value current)))))
+              (node-insert! rb-queue current-neighbor (inc @(:value current)) nil)))
           (recur (rest neighbors)))))
       (dosync
         (ref-set (:status (get-vertex graph (:label current))) visited))
@@ -330,6 +330,7 @@
 
 (defn dijkstra! [graph start finish]
   (graph-reset! graph)
+  (def rb-queue (make-red-black-tree!))
   (if (= @(:component @(get-vertex graph start))
          @(:component @(get-vertex graph finish)))
     (do
@@ -341,6 +342,24 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;Dijkstra Breadth First Search ;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;A* Algorithm ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(defn great-circle-distance [graph label1 label2]
+  (let [vertex1 (get-vertex graph label1)
+        vertex2 (get-vertex graph label2)
+        lat1 (:latitude vertex1)
+        lon1 (:longitude vertex1)
+        lat2 (:latitude vertex2)
+        lon2 (:longitude vertex2)
+        dl (Math/abs (- lon2 lon1)) ; lambda - longitude
+        dp (Math/abs (- lat2 lat1)) ; phi - latitude
+        dlr (/ (* Math/PI dl) 180)
+        dpr (/ (* Math/PI dp) 180)
+        l1 (/ (* Math/PI lon1) 180)
+        p1 (/ (* Math/PI lat1) 180)
+        l2 (/ (* Math/PI lon2) 180)
+        p2 (/ (* Math/PI lat2) 180)
+        ds (Math/acos (+ (* (Math/sin p1) (Math/sin p2))
+                         (* (Math/cos p1) (Math/cos p2) (Math/cos dlr))))]
+    (* 6378 ds)))
 
 ;;;;;;;;;;;;;;;;;;;Weights Pick Best Neigbor::::::::::::::::::::::::::::::::::::
 (defn weighted-trace-back-pick-best [graph vertex]
@@ -376,20 +395,28 @@
 
 ;;;;;;;BFS A*;;;;;;;
 (defn breadth-first-search-a*! [graph start finish]
-  (node-insert! rb-queue finish 0)
+  (node-insert! rb-queue finish (great-circle-distance graph finish start) 0)
   (loop []
     (when (not (red-black-tree-empty? rb-queue))
-    (let [current (pick-least-node (:root rb-queue))]
+    (let [current (pick-least-node (:root rb-queue) start)]
       (remove-least-node! (:root rb-queue))
       (dosync
         (ref-set (:distance (get-vertex graph (:label current)))
-                  @(:value current)))
+                 @(:value2 current)))
       (when (not (= (:label current) start))
         (loop [neighbors
               @(:neighbors (get-vertex graph (:label current)))]
-          (let [current-neighbor (first neighbors)]
+          (let [current-neighbor (first neighbors)
+                edge-distance (:distance (get-edge graph
+                                                   current-neighbor
+                                                   (:label current)))
+                great-circle (great-circle-distance graph
+                                                    current-neighbor
+                                                    start)]
             (when (vertex-unseen? graph current-neighbor)
-              (node-insert! rb-queue current-neighbor (inc @(:value current)))))
+              (node-insert! rb-queue current-neighbor
+                            great-circle
+                            (+ @(:value current) edge-distance))))
           (recur (rest neighbors)))))
     (recur))))
 ;;;;;;;BFS A*;;;;;;;
@@ -397,6 +424,7 @@
 ;;;;;;;;A*;;;;;;;;;;;
 (defn a*! [graph start finish]
   (graph-reset! graph)
+  (def rb-queue (make-red-black-tree!))
   (if (= @(:component @(get-vertex graph start))
          @(:component @(get-vertex graph finish)))
     (do
@@ -409,7 +437,7 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;Count Components;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defn breadth-first-search-connected-components! [graph start index]
-  (node-insert! rb-queue start index)
+  (node-insert! rb-queue start index nil)
   (loop []
     (when (not (red-black-tree-empty? rb-queue))
     (let [current (pick-least-node (:root rb-queue))]
@@ -421,7 +449,7 @@
             @(:neighbors (get-vertex graph (:label current)))]
         (let [current-neighbor (first neighbors)]
           (when (vertex-unseen? graph current-neighbor)
-            (node-insert! rb-queue current-neighbor index)))
+            (node-insert! rb-queue current-neighbor index nil)))
         (recur (rest neighbors))))
       (dosync
         (ref-set (:status (get-vertex graph (:label current))) visited))
