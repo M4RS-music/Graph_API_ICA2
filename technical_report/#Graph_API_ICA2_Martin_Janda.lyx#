@@ -237,6 +237,35 @@ g programming language.
 \end_layout
 
 \begin_layout Section
+Definitions
+\end_layout
+
+\begin_layout Itemize
+Graph: A set of vertices and edges.
+\end_layout
+
+\begin_layout Itemize
+Sparse (graph): A graph that has less then v
+\begin_inset script superscript
+
+\begin_layout Plain Layout
+2
+\end_layout
+
+\end_inset
+
+ edges, where 
+\begin_inset Quotes eld
+\end_inset
+
+v
+\begin_inset Quotes erd
+\end_inset
+
+ is the number of vertices.
+\end_layout
+
+\begin_layout Section
 Prerequisite Structures and Functions
 \end_layout
 
@@ -253,7 +282,7 @@ Data Structures
 \begin_layout Paragraph*
 This subsection addresses the underlying record structures of the implementation.
  Words on the efficiency of and justifications for these structures are
- in subsection 3.2.
+ in subsection 4.2.
 \end_layout
 
 \begin_layout Subsubsection
@@ -1424,6 +1453,16 @@ x
  This is because the connected components are counted and marked after the
  entire graph has been recorded.
  The open-queue has also been optimized using a red black tree.
+ The time complexity of this function is not tightly bound O(n
+\begin_inset script superscript
+
+\begin_layout Plain Layout
+2
+\end_layout
+
+\end_inset
+
+) and Ω(1) in a sparse graph.
 \end_layout
 
 \begin_layout Section
@@ -1801,8 +1840,119 @@ dijkstra-trace-back-pick-best
 A* Function
 \end_layout
 
+\begin_layout Standard
+\begin_inset listings
+lstparams "language=Lisp,numbers=left,basicstyle={\ttfamily},tabsize=1"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+(defn a*! [graph start finish]
+\end_layout
+
+\begin_layout Plain Layout
+
+  (graph-reset! graph)
+\end_layout
+
+\begin_layout Plain Layout
+
+  (def rb-queue (make-red-black-tree!))
+\end_layout
+
+\begin_layout Plain Layout
+
+  (if (= @(:component @(get-vertex graph start))
+\end_layout
+
+\begin_layout Plain Layout
+
+         @(:component @(get-vertex graph finish)))
+\end_layout
+
+\begin_layout Plain Layout
+
+    (do
+\end_layout
+
+\begin_layout Plain Layout
+
+      (breadth-first-search-a*! graph start finish)
+\end_layout
+
+\begin_layout Plain Layout
+
+      (weighted-trace-back graph start finish))
+\end_layout
+
+\begin_layout Plain Layout
+
+    (println "No path exists!")))
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Paragraph*
+The 
+\begin_inset Quotes eld
+\end_inset
+
+a*!
+\begin_inset Quotes erd
+\end_inset
+
+ function follows the same exact steps as pictured in Figure 3.
+ The only difference is the function calls the A* versions of breadth first
+ search and trace back functions.
+ A* is in principle a version of Dijkstra's algorithm that is capable of
+ 
+\begin_inset Quotes eld
+\end_inset
+
+aiming
+\begin_inset Quotes erd
+\end_inset
+
+ its search towards the start node.
+ This generally makes it more efficient.
+\end_layout
+
 \begin_layout Subsection
 Efficiency and Justification
+\end_layout
+
+\begin_layout Paragraph*
+A* was chosen because it is one of the most efficient algorithms for finding
+ a path in a weighted graph.
+ In fact there are very few scenarios in which a different algorithm would
+ outperform A*.
+ In a trivially small graph Dijkstra's algorithm would outperform A* because
+ they will both do the same amount of iterations.
+ If multiple search operations are to be performed all coming from the same
+ starting vertex a slightly modified Dijkstra's algorithm would work much
+ better.
+\end_layout
+
+\begin_layout Paragraph*
+A* uses heuristic values (latitude and longitude) in a type of 
+\begin_inset Quotes eld
+\end_inset
+
+best
+\begin_inset Quotes erd
+\end_inset
+
+ first search, since the data supplied contained latitude and longitude
+ values for each vertex A* made the most efficient use of the data supplied.
+ The time complexity of A* has a direct relationship with the heuristic
+ function, it is not tightly bound and generally is not written as a function
+ of the number of vertices in a graph.
+ Speculations can be made that it is exponential for the length of the path
+ returned in the upper bound.
 \end_layout
 
 \begin_layout Section
@@ -1810,12 +1960,12 @@ Conclusion
 \end_layout
 
 \begin_layout Paragraph*
-In general the subject graph-related algorithms is an extremely nuanced
+In general the subject of graph-related algorithms is an extremely nuanced
  part of mathematics in computing.
  There are countless real world applications, even for the algorithms discussed
- in this doccument (networking, GPS Navigation, logistics).
+ in this document (networking, GPS Navigation, logistics).
  The authors goal when writing this code was to write the most efficient
- versions of these algorithms withing his capabilities.
+ versions of these algorithms within his capabilities.
  However, this is in no way a claim that there aren't any improvements to
  be made.
  With higher level functions such as this there are so many variables to
