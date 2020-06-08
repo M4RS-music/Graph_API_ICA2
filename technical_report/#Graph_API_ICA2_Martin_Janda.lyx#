@@ -111,7 +111,7 @@ ICA2
 \end_layout
 
 \begin_layout Paragraph*
-3266 Words
+3625 Words
 \end_layout
 
 \begin_layout Paragraph*
@@ -263,6 +263,18 @@ v
 \end_inset
 
  is the number of vertices.
+\end_layout
+
+\begin_layout Itemize
+Path: A sequence of vertices connected by edges.
+\end_layout
+
+\begin_layout Itemize
+Cycle: A path that begins and ends on the same vertex.
+\end_layout
+
+\begin_layout Itemize
+Tree: A form of graph that contains no cycles.
 \end_layout
 
 \begin_layout Section
@@ -1946,13 +1958,14 @@ best
 \begin_inset Quotes erd
 \end_inset
 
- first search, since the data supplied contained latitude and longitude
- values for each vertex A* made the most efficient use of the data supplied.
+ first search (Pantůček 2020), since the data supplied contained latitude
+ and longitude values for each vertex A* made the most efficient use of
+ the data supplied.
  The time complexity of A* has a direct relationship with the heuristic
  function, it is not tightly bound and generally is not written as a function
  of the number of vertices in a graph.
  Speculations can be made that it is exponential for the length of the path
- returned in the upper bound.
+ returned in the upper bound (Santoso, 2010).
 \end_layout
 
 \begin_layout Section
@@ -1976,6 +1989,31 @@ In general the subject of graph-related algorithms is an extremely nuanced
  What this assignment did accomplish was the delivery of a clear competent
  explanation of the given algorithms and a justification for the improvements
  that have been made.
+\end_layout
+
+\begin_layout Section
+References
+\end_layout
+
+\begin_layout Paragraph*
+Pantůček, D., 2020, Algorithms and Data Structures (ALDS-400-2001), Spring
+ 2020 21.
+ A* Search Algorithm Finding Shortest Path in Weighted Graph, Presentation,
+ Prague College, Prague.
+\end_layout
+
+\begin_layout Paragraph*
+Pantůček, D., 2020, Algorithms and Data Structures (ALDS-400-2001), Spring
+ 2020 21.
+ A* Search Algorithm Finding Shortest Path in Weighted Graph, Presentation,
+ Prague College, Prague.
+\end_layout
+
+\begin_layout Paragraph*
+Santoso, L.
+ W., 2010, Performance Analysis of Dijkstra, A* and Ant Algorithm for Finding
+ Optimal Path Case Study: Surabaya City Map, Article, Petra Christian University
+, Surabaya.
 \end_layout
 
 \end_body

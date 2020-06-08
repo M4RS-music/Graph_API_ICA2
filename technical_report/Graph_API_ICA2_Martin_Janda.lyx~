@@ -111,7 +111,7 @@ ICA2
 \end_layout
 
 \begin_layout Paragraph*
-3266 Words
+3676 Words
 \end_layout
 
 \begin_layout Paragraph*
@@ -237,6 +237,48 @@ g programming language.
 \end_layout
 
 \begin_layout Section
+Definitions
+\end_layout
+
+\begin_layout Itemize
+Graph: A set of vertices and edges.
+\end_layout
+
+\begin_layout Itemize
+Sparse (graph): A graph that has less then v
+\begin_inset script superscript
+
+\begin_layout Plain Layout
+2
+\end_layout
+
+\end_inset
+
+ edges, where 
+\begin_inset Quotes eld
+\end_inset
+
+v
+\begin_inset Quotes erd
+\end_inset
+
+ is the number of vertices.
+\end_layout
+
+\begin_layout Itemize
+Path: A sequence of vertices connected by edges.
+ (Pantůček, 2020)
+\end_layout
+
+\begin_layout Itemize
+Cycle: A path that begins and ends on the same vertex.
+\end_layout
+
+\begin_layout Itemize
+Tree: A form of graph that contains no cycles.
+\end_layout
+
+\begin_layout Section
 Prerequisite Structures and Functions
 \end_layout
 
@@ -253,7 +295,7 @@ Data Structures
 \begin_layout Paragraph*
 This subsection addresses the underlying record structures of the implementation.
  Words on the efficiency of and justifications for these structures are
- in subsection 3.2.
+ in subsection 4.2.
 \end_layout
 
 \begin_layout Subsubsection
@@ -1424,6 +1466,16 @@ x
  This is because the connected components are counted and marked after the
  entire graph has been recorded.
  The open-queue has also been optimized using a red black tree.
+ The time complexity of this function is not tightly bound O(n
+\begin_inset script superscript
+
+\begin_layout Plain Layout
+2
+\end_layout
+
+\end_inset
+
+) and Ω(1) in a sparse graph.
 \end_layout
 
 \begin_layout Section
@@ -1448,23 +1500,128 @@ status open
 
 \begin_layout Plain Layout
 
-(defn breadth-first-search-a*! [graph start finish]   (node-insert! rb-queue
- finish (great-circle-distance graph finish start) 0)   (loop []     (when
- (not (red-black-tree-empty? rb-queue))     (let [current (pick-least-node
- (:root rb-queue) start)]       (remove-least-node! (:root rb-queue))  
-     (dosync         (ref-set (:distance (get-vertex graph (:label current)))
-                  @(:value2 current)))       (when (not (= (:label current)
- start))         (loop [neighbors               @(:neighbors (get-vertex
- graph (:label current)))]           (let [current-neighbor (first neighbors)
-                 edge-distance (:distance (get-edge graph              
-                                      current-neighbor                 
-                                   (:label current)))                 great-circ
-le (great-circle-distance graph                                        
-             current-neighbor                                          
-           start)]             (when (vertex-unseen? graph current-neighbor)
-               (node-insert! rb-queue current-neighbor                 
-            great-circle                             (+ @(:value current)
- edge-distance))))           (recur (rest neighbors)))))     (recur))))
+(defn breadth-first-search-a*! [graph start finish]
+\end_layout
+
+\begin_layout Plain Layout
+
+  (node-insert! rb-queue finish (great-circle-distance graph finish start)
+ 0)
+\end_layout
+
+\begin_layout Plain Layout
+
+  (loop []
+\end_layout
+
+\begin_layout Plain Layout
+
+    (when (not (red-black-tree-empty? rb-queue))
+\end_layout
+
+\begin_layout Plain Layout
+
+    (let [current (pick-least-node (:root rb-queue) start)]
+\end_layout
+
+\begin_layout Plain Layout
+
+      (remove-least-node! (:root rb-queue))
+\end_layout
+
+\begin_layout Plain Layout
+
+      (dosync
+\end_layout
+
+\begin_layout Plain Layout
+
+        (ref-set (:distance (get-vertex graph (:label current)))
+\end_layout
+
+\begin_layout Plain Layout
+
+                 @(:value2 current)))
+\end_layout
+
+\begin_layout Plain Layout
+
+      (when (not (= (:label current) start))
+\end_layout
+
+\begin_layout Plain Layout
+
+        (loop [neighbors
+\end_layout
+
+\begin_layout Plain Layout
+
+              @(:neighbors (get-vertex graph (:label current)))]
+\end_layout
+
+\begin_layout Plain Layout
+
+          (let [current-neighbor (first neighbors)
+\end_layout
+
+\begin_layout Plain Layout
+
+                edge-distance (:distance (get-edge graph
+\end_layout
+
+\begin_layout Plain Layout
+
+                                                   current-neighbor
+\end_layout
+
+\begin_layout Plain Layout
+
+                                                   (:label current)))
+\end_layout
+
+\begin_layout Plain Layout
+
+                great-circle (great-circle-distance graph
+\end_layout
+
+\begin_layout Plain Layout
+
+                                                    current-neighbor
+\end_layout
+
+\begin_layout Plain Layout
+
+                                                    start)]
+\end_layout
+
+\begin_layout Plain Layout
+
+            (when (vertex-unseen? graph current-neighbor)
+\end_layout
+
+\begin_layout Plain Layout
+
+              (node-insert! rb-queue current-neighbor
+\end_layout
+
+\begin_layout Plain Layout
+
+                            great-circle
+\end_layout
+
+\begin_layout Plain Layout
+
+                            (+ @(:value current) edge-distance))))
+\end_layout
+
+\begin_layout Plain Layout
+
+          (recur (rest neighbors)))))
+\end_layout
+
+\begin_layout Plain Layout
+
+    (recur))))
 \end_layout
 
 \end_inset
@@ -1801,8 +1958,120 @@ dijkstra-trace-back-pick-best
 A* Function
 \end_layout
 
+\begin_layout Standard
+\begin_inset listings
+lstparams "language=Lisp,numbers=left,basicstyle={\ttfamily},tabsize=1"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+(defn a*! [graph start finish]
+\end_layout
+
+\begin_layout Plain Layout
+
+  (graph-reset! graph)
+\end_layout
+
+\begin_layout Plain Layout
+
+  (def rb-queue (make-red-black-tree!))
+\end_layout
+
+\begin_layout Plain Layout
+
+  (if (= @(:component @(get-vertex graph start))
+\end_layout
+
+\begin_layout Plain Layout
+
+         @(:component @(get-vertex graph finish)))
+\end_layout
+
+\begin_layout Plain Layout
+
+    (do
+\end_layout
+
+\begin_layout Plain Layout
+
+      (breadth-first-search-a*! graph start finish)
+\end_layout
+
+\begin_layout Plain Layout
+
+      (weighted-trace-back graph start finish))
+\end_layout
+
+\begin_layout Plain Layout
+
+    (println "No path exists!")))
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Paragraph*
+The 
+\begin_inset Quotes eld
+\end_inset
+
+a*!
+\begin_inset Quotes erd
+\end_inset
+
+ function follows the same exact steps as pictured in Figure 3.
+ The only difference is the function calls the A* versions of breadth first
+ search and trace back functions.
+ A* is in principle a version of Dijkstra's algorithm that is capable of
+ 
+\begin_inset Quotes eld
+\end_inset
+
+aiming
+\begin_inset Quotes erd
+\end_inset
+
+ its search towards the start node.
+ This generally makes it more efficient.
+\end_layout
+
 \begin_layout Subsection
 Efficiency and Justification
+\end_layout
+
+\begin_layout Paragraph*
+A* was chosen because it is one of the most efficient algorithms for finding
+ a path in a weighted graph.
+ In fact there are very few scenarios in which a different algorithm would
+ outperform A*.
+ In a trivially small graph Dijkstra's algorithm would outperform A* because
+ they will both do the same amount of iterations.
+ If multiple search operations are to be performed all coming from the same
+ starting vertex a slightly modified Dijkstra's algorithm would work much
+ better.
+\end_layout
+
+\begin_layout Paragraph*
+A* uses heuristic values (latitude and longitude) in a type of 
+\begin_inset Quotes eld
+\end_inset
+
+best
+\begin_inset Quotes erd
+\end_inset
+
+ first search (Pantůček 2020), since the data supplied contained latitude
+ and longitude values for each vertex A* made the most efficient use of
+ the data supplied.
+ The time complexity of A* has a direct relationship with the heuristic
+ function, it is not tightly bound and generally is not written as a function
+ of the number of vertices in a graph.
+ Speculations can be made that it is exponential for the length of the path
+ returned in the upper bound (Santoso, 2010).
 \end_layout
 
 \begin_layout Section
@@ -1826,6 +2095,31 @@ In general the subject of graph-related algorithms is an extremely nuanced
  What this assignment did accomplish was the delivery of a clear competent
  explanation of the given algorithms and a justification for the improvements
  that have been made.
+\end_layout
+
+\begin_layout Section
+References
+\end_layout
+
+\begin_layout Paragraph*
+Pantůček, D., 2020, Algorithms and Data Structures (ALDS-400-2001), Spring
+ 2020 21.
+ A* Search Algorithm Finding Shortest Path in Weighted Graph, Presentation,
+ Prague College, Prague.
+\end_layout
+
+\begin_layout Paragraph*
+Pantůček, D., 2020, Algorithms and Data Structures (ALDS-400-2001), Spring
+ 2020 17.
+ Dijkstra’s Algorithm Finding Shortest Path, Presentation, Prague College,
+ Prague.
+\end_layout
+
+\begin_layout Paragraph*
+Santoso, L.
+ W., 2010, Performance Analysis of Dijkstra, A* and Ant Algorithm for Finding
+ Optimal Path Case Study: Surabaya City Map, Article, Petra Christian University
+, Surabaya.
 \end_layout
 
 \end_body
