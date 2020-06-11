@@ -122,10 +122,10 @@
       (ref-set (:parent a) b)
       (ref-set (:child a) Left)
       (ref-set (:child b) child)
-      (when (not (nil? @(RIGHT a)))
+      (when (not (tree-node-empty? @(RIGHT a)))
         (ref-set (:parent @(RIGHT a)) a)
         (ref-set (:child @(RIGHT a)) Right))
-      (when (not (nil? p))
+      (when (not (tree-node-empty? p))
         (if (= a @(LEFT p))
           (ref-set (LEFT p) b)
           (if (= a @(RIGHT p))
@@ -143,10 +143,10 @@
       (ref-set (:parent a) b)
       (ref-set (:child a) Right)
       (ref-set (:child b) child)
-      (when (not (nil? @(RIGHT a)))
+      (when (not (tree-node-empty? @(RIGHT a)))
         (ref-set (:parent @(RIGHT a)) a)
         (ref-set (:child @(RIGHT a)) Left))
-      (when (not (nil? p))
+      (when (not (tree-node-empty? p))
         (if (= a @(LEFT p))
           (ref-set (LEFT p) b)
           (if (= a @(RIGHT p))
@@ -200,20 +200,26 @@
         (red-parent-black-uncle-checker! node)))))
 ;;;;;;;;;;;;;;;;;;;;;;; Queue Related Insertion ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(defn node-insert-helper! [node parent label value value2 child]
+(defn node-insert-helper! [node parent label value value2 child tree]
   (if (tree-node-empty? node)
     (do
       (dosync
         (ref-set node
           (make-node! label value value2 Red @parent child)))
-      (red-black-rules-checker! node))
+      (red-black-rules-checker! node)
+      ;;This loop should fix the root of the tree after the rotations
+      (loop [n @node]
+        (let [p @(:parent n)]
+        (if (nil? p)
+          (dosync (ref-set (:root tree) n))
+          (recur p)))))
     (cond
       (< value @(:value @node))
-        (node-insert-helper! (:left @node) node label value value2 Left)
+        (node-insert-helper! (:left @node) node label value value2 Left tree
       (> value @(:value @node))
-        (node-insert-helper! (:right @node) node label value value2 Right)
+        (node-insert-helper! (:right @node) node label value value2 Right tree)
       (= value @(:value @node))
-        (node-insert-helper! (:right @node) node label value value2 Right))))
+        (node-insert-helper! (:right @node) node label value value2 Right tree)))))
 
 (defn node-insert! [tree label value value2]
   (if (red-black-tree-empty? tree)
@@ -222,11 +228,11 @@
         (make-node! label value value2 Black nil Root)))
     (cond
       (< value @(:value @(:root tree)))
-        (node-insert-helper! (:left @(:root tree)) (:root tree) label value value2 Left)
+        (node-insert-helper! (:left @(:root tree)) (:root tree) label value value2 Left tree)
       (> value @(:value @(:root tree)))
-        (node-insert-helper! (:right @(:root tree)) (:root tree) label value value2 Right)
+        (node-insert-helper! (:right @(:root tree)) (:root tree) label value value2 Right tree)
       (= value @(:value @(:root tree)))
-        (node-insert-helper! (:right @(:root tree)) (:root tree) label value value2 Right))))
+        (node-insert-helper! (:right @(:root tree)) (:root tree) label value value2 Right tree))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Queue Operations ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -331,8 +337,8 @@
 (defn dijkstra! [graph start finish]
   (graph-reset! graph)
   (def rb-queue (make-red-black-tree!))
-  (if (= @(:component @(get-vertex graph start))
-         @(:component @(get-vertex graph finish)))
+  (if (= @(:component (get-vertex graph start))
+         @(:component (get-vertex graph finish)))
     (do
       (breadth-first-search-dijkstra! graph start finish)
       (dijkstra-trace-back graph start finish))
@@ -425,8 +431,8 @@
 (defn a*! [graph start finish]
   (graph-reset! graph)
   (def rb-queue (make-red-black-tree!))
-  (if (= @(:component @(get-vertex graph start))
-         @(:component @(get-vertex graph finish)))
+  (if (= @(:component (get-vertex graph start))
+         @(:component (get-vertex graph finish)))
     (do
       (breadth-first-search-a*! graph start finish)
       (weighted-trace-back graph start finish))
@@ -464,6 +470,7 @@
 
 (defn index-components! [graph]
   (graph-reset! graph)
+  (def rb-queue (make-red-black-tree!))
   (loop [index 0]
     (breadth-first-search-connected-components! graph
                                                 (remaining-unseen graph)

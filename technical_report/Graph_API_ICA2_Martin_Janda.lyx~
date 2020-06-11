@@ -512,7 +512,7 @@ status open
 
 \begin_layout Plain Layout
 
-(defn node-insert! [tree label value]
+(defn node-insert! [tree label value value2]
 \end_layout
 
 \begin_layout Plain Layout
@@ -532,7 +532,7 @@ status open
 
 \begin_layout Plain Layout
 
-       (make-node! label value Black nil Root)))
+        (make-node! label value value2 Black nil Root)))
 \end_layout
 
 \begin_layout Plain Layout
@@ -542,13 +542,17 @@ status open
 
 \begin_layout Plain Layout
 
-     (< value @(:value @(:root tree)))
+      (< value @(:value @(:root tree)))
 \end_layout
 
 \begin_layout Plain Layout
 
-        (node-insert-helper! (:left @(:root tree)) (:root tree) label value
- Left)
+        (node-insert-helper! (:left @(:root tree)) (:root tree)
+\end_layout
+
+\begin_layout Plain Layout
+
+							 label value value2 Left)
 \end_layout
 
 \begin_layout Plain Layout
@@ -558,8 +562,12 @@ status open
 
 \begin_layout Plain Layout
 
-        (node-insert-helper! (:right @(:root tree)) (:root tree) label value
- Right)
+        (node-insert-helper! (:right @(:root tree)) (:root tree)
+\end_layout
+
+\begin_layout Plain Layout
+
+						     label value value2 Right)
 \end_layout
 
 \begin_layout Plain Layout
@@ -569,8 +577,12 @@ status open
 
 \begin_layout Plain Layout
 
-        (node-insert-helper! (:right @(:root tree)) (:root tree) label value
- Right))))
+        (node-insert-helper! (:right @(:root tree)) (:root tree)
+\end_layout
+
+\begin_layout Plain Layout
+
+							 label value value2 Right))))
 \end_layout
 
 \end_inset
@@ -586,7 +598,7 @@ status open
 
 \begin_layout Plain Layout
 
-(defn node-insert-helper! [node parent label value child]
+(defn node-insert-helper! [node parent label value value2 child]
 \end_layout
 
 \begin_layout Plain Layout
@@ -611,7 +623,7 @@ status open
 
 \begin_layout Plain Layout
 
-          (make-node! label value Red @parent child)))
+          (make-node! label value value2 Red @parent child)))
 \end_layout
 
 \begin_layout Plain Layout
@@ -626,32 +638,47 @@ status open
 
 \begin_layout Plain Layout
 
-      (< value @(:value @node))
+      (< value @(:value @(:root tree)))
 \end_layout
 
 \begin_layout Plain Layout
 
-        (node-insert-helper! (:left @node) node label value Left)
+        (node-insert-helper! (:left @(:root tree)) (:root tree)
 \end_layout
 
 \begin_layout Plain Layout
 
-      (> value @(:value @node))
+							 label value value2 Left)
 \end_layout
 
 \begin_layout Plain Layout
 
-        (node-insert-helper! (:right @node) node label value Right)
+      (> value @(:value @(:root tree)))
 \end_layout
 
 \begin_layout Plain Layout
 
-      (= value @(:value @node))
+        (node-insert-helper! (:right @(:root tree)) (:root tree)
 \end_layout
 
 \begin_layout Plain Layout
 
-        (node-insert-helper! (:right @node) node label value Right))))
+						     label value value2 Right)
+\end_layout
+
+\begin_layout Plain Layout
+
+      (= value @(:value @(:root tree)))
+\end_layout
+
+\begin_layout Plain Layout
+
+        (node-insert-helper! (:right @(:root tree)) (:root tree)
+\end_layout
+
+\begin_layout Plain Layout
+
+							 label value value2 Right))))
 \end_layout
 
 \end_inset
@@ -783,17 +810,92 @@ status open
 
 \begin_layout Plain Layout
 
-(defn breadth-first-search-connected-components! [graph start index]   (node-ins
-ert! rb-queue start index nil)   (loop []     (when (not (red-black-tree-empty?
- rb-queue))     (let [current (pick-least-node (:root rb-queue))]      
- (remove-least-node! (:root rb-queue))       (dosync         (ref-set (:componen
-t (get-vertex graph (:label current)))                   @(:value current)))
-       (loop [neighbors             @(:neighbors (get-vertex graph (:label
- current)))]         (let [current-neighbor (first neighbors)]         
-  (when (vertex-unseen? graph current-neighbor)             (node-insert!
- rb-queue current-neighbor index nil)))         (recur (rest neighbors))))
-       (dosync         (ref-set (:status (get-vertex graph (:label current)))
- visited))     (recur))))
+(defn breadth-first-search-connected-components! [graph start index]
+\end_layout
+
+\begin_layout Plain Layout
+
+  (node-insert! rb-queue start index nil)
+\end_layout
+
+\begin_layout Plain Layout
+
+  (loop []
+\end_layout
+
+\begin_layout Plain Layout
+
+    (when (not (red-black-tree-empty? rb-queue))
+\end_layout
+
+\begin_layout Plain Layout
+
+    (let [current (pick-least-node (:root rb-queue))]
+\end_layout
+
+\begin_layout Plain Layout
+
+      (remove-least-node! (:root rb-queue))
+\end_layout
+
+\begin_layout Plain Layout
+
+      (dosync
+\end_layout
+
+\begin_layout Plain Layout
+
+        (ref-set (:component (get-vertex graph (:label current)))
+\end_layout
+
+\begin_layout Plain Layout
+
+                  @(:value current)))
+\end_layout
+
+\begin_layout Plain Layout
+
+      (loop [neighbors
+\end_layout
+
+\begin_layout Plain Layout
+
+            @(:neighbors (get-vertex graph (:label current)))]
+\end_layout
+
+\begin_layout Plain Layout
+
+        (let [current-neighbor (first neighbors)]
+\end_layout
+
+\begin_layout Plain Layout
+
+          (when (vertex-unseen? graph current-neighbor)
+\end_layout
+
+\begin_layout Plain Layout
+
+            (node-insert! rb-queue current-neighbor index nil)))
+\end_layout
+
+\begin_layout Plain Layout
+
+        (recur (rest neighbors))))
+\end_layout
+
+\begin_layout Plain Layout
+
+      (dosync
+\end_layout
+
+\begin_layout Plain Layout
+
+        (ref-set (:status (get-vertex graph (:label current))) visited))
+\end_layout
+
+\begin_layout Plain Layout
+
+    (recur))))
 \end_layout
 
 \end_inset
@@ -952,18 +1054,98 @@ status open
 
 \begin_layout Plain Layout
 
-(defn breadth-first-search-dijkstra! [graph start finish]   (node-insert!
- rb-queue finish 0 nil)   (loop []     (when (not (red-black-tree-empty?
- rb-queue))     (let [current (pick-least-node (:root rb-queue))]      
- (remove-least-node! (:root rb-queue))       (dosync         (ref-set (:distance
- (get-vertex graph (:label current)))                   @(:value current)))
-       (when (not (= (:label current) start))         (loop [neighbors 
-              @(:neighbors (get-vertex graph (:label current)))]       
-    (let [current-neighbor (first neighbors)]             (when (vertex-unseen?
- graph current-neighbor)               (node-insert! rb-queue current-neighbor
- (inc @(:value current)) nil)))           (recur (rest neighbors)))))  
-     (dosync         (ref-set (:status (get-vertex graph (:label current)))
- visited))     (recur))))
+(defn breadth-first-search-dijkstra! [graph start finish]
+\end_layout
+
+\begin_layout Plain Layout
+
+  (node-insert! rb-queue finish 0 nil)
+\end_layout
+
+\begin_layout Plain Layout
+
+  (loop []
+\end_layout
+
+\begin_layout Plain Layout
+
+    (when (not (red-black-tree-empty? rb-queue))
+\end_layout
+
+\begin_layout Plain Layout
+
+    (let [current (pick-least-node (:root rb-queue))]
+\end_layout
+
+\begin_layout Plain Layout
+
+      (remove-least-node! (:root rb-queue))
+\end_layout
+
+\begin_layout Plain Layout
+
+      (dosync
+\end_layout
+
+\begin_layout Plain Layout
+
+        (ref-set (:distance (get-vertex graph (:label current)))
+\end_layout
+
+\begin_layout Plain Layout
+
+                  @(:value current)))
+\end_layout
+
+\begin_layout Plain Layout
+
+      (when (not (= (:label current) start))
+\end_layout
+
+\begin_layout Plain Layout
+
+        (loop [neighbors
+\end_layout
+
+\begin_layout Plain Layout
+
+              @(:neighbors (get-vertex graph (:label current)))]
+\end_layout
+
+\begin_layout Plain Layout
+
+          (let [current-neighbor (first neighbors)]
+\end_layout
+
+\begin_layout Plain Layout
+
+            (when (vertex-unseen? graph current-neighbor)
+\end_layout
+
+\begin_layout Plain Layout
+
+              (node-insert! rb-queue current-neighbor (inc @(:value current))
+ nil)))
+\end_layout
+
+\begin_layout Plain Layout
+
+          (recur (rest neighbors)))))
+\end_layout
+
+\begin_layout Plain Layout
+
+      (dosync
+\end_layout
+
+\begin_layout Plain Layout
+
+        (ref-set (:status (get-vertex graph (:label current))) visited))
+\end_layout
+
+\begin_layout Plain Layout
+
+    (recur))))
 \end_layout
 
 \end_inset

@@ -111,7 +111,7 @@ ICA2
 \end_layout
 
 \begin_layout Paragraph*
-3676 Words
+3867 Words
 \end_layout
 
 \begin_layout Paragraph*
@@ -232,8 +232,8 @@ The aim of this assignment is to describe the most efficient implementation
  This technical report also addresses the graph and helper structures that
  have been implemented as they are a large part of the code being submitted
  and contribute directly to the efficiency of the algorithms.
- All code in this document was written by the author in Clojure a list processin
-g programming language.
+ All code in this document was written by the author in Clojure - a list
+ processing programming language.
 \end_layout
 
 \begin_layout Section
@@ -241,7 +241,8 @@ Definitions
 \end_layout
 
 \begin_layout Itemize
-Graph: A set of vertices and edges.
+Graph: A set of vertices (points) and edges (lines connecting vertices).
+ (Matoušek, 1998)
 \end_layout
 
 \begin_layout Itemize
@@ -446,6 +447,49 @@ status open
 \begin_layout Plain Layout
 
 (defrecord Red-Black-Node [label value value2 color left right parent child])
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Paragraph*
+In Figure 1 is a basic depiction of the structure of the red-black tree.
+ You can see that the tree itself is simply a reference to the root node.
+ The root node has a reference to its parent which is nil (root nodes do
+ not have parents).
+ The root node also has two children that have references to the root node
+ as their parent.
+ What is not depicted in the diagram is the references to nil leaf nodes
+ that exist for the two children of the root.
+ These nil leaf nodes exist exclusively to satisfy the conditions defining
+ a red-black tree.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+Red-Black Tree Structure
+\end_layout
+
+\end_inset
+
+
+\begin_inset Graphics
+	filename /Users/martinjanda/Documents/tree.png
+	scale 75
+
+\end_inset
+
+
 \end_layout
 
 \end_inset
@@ -725,7 +769,7 @@ Justification
 
 \begin_layout Paragraph*
 Using a red-black tree has a number of benefits.
- Using a list for the open-queue in breadth first search his not optimal.
+ Using a list for the open-queue in breadth first search is not optimal.
  In Clojure lists are single-linked which means that the head of the list
  contains a reference to only the first node and nodes only contain a reference
  to the next node and not the previous.
@@ -746,7 +790,7 @@ The red-black tree solves this problem as it is a form of a binary search
  For insertions the time complexity is not tightly bound O(log n) and Ω(1)
  if the tree is empty.
  This logarithmic time complexity is due to the maximum height of any red-black
- tree which is O(log n) thanks to the self balancing nature of the tree.
+ tree being O(log n) thanks to the self balancing nature of the tree.
  
 \end_layout
 
@@ -1021,11 +1065,9 @@ unseen
 The time complexity of this function is tightly bound and linear O(n)= Ω(n)=Θ(n)
  as the breadth first search will iterate through the entire graph before
  the loop ends.
- The memory complexity of this function is tightly bound and constant O(1)=
- Ω(1)=Θ(1) as it only keeps track of a set amount of nodes at a time.
  This is theoretically the only way to label the connected components of
- a graph as regardless of the traversing function the entire set of vertices
- must be iterated through.
+ a graph as regardless of the chosen traversing function the entire set
+ of vertices must be iterated through.
  Thanks to this being run after all the data has been added to the graph,
  the time complexity of proving there exists no path between two vertices
  is near constant due to Clojure's hash maps.
@@ -1124,8 +1166,12 @@ status open
 
 \begin_layout Plain Layout
 
-              (node-insert! rb-queue current-neighbor (inc @(:value current))
- nil)))
+              (node-insert! rb-queue current-neighbor 
+\end_layout
+
+\begin_layout Plain Layout
+
+							(inc @(:value current)) nil)))
 \end_layout
 
 \begin_layout Plain Layout
@@ -1140,7 +1186,12 @@ status open
 
 \begin_layout Plain Layout
 
-        (ref-set (:status (get-vertex graph (:label current))) visited))
+        (ref-set (:status (get-vertex graph (:label current))) 
+\end_layout
+
+\begin_layout Plain Layout
+
+				 visited))
 \end_layout
 
 \begin_layout Plain Layout
@@ -1658,6 +1709,8 @@ x
 \end_inset
 
 ) and Ω(1) in a sparse graph.
+ The memory complexity is roughly equal to the average amount of neighbors
+ any given vertex has in the graph.
 \end_layout
 
 \begin_layout Section
@@ -2253,7 +2306,27 @@ best
  function, it is not tightly bound and generally is not written as a function
  of the number of vertices in a graph.
  Speculations can be made that it is exponential for the length of the path
- returned in the upper bound (Santoso, 2010).
+ returned in the upper bound O(2
+\begin_inset script superscript
+
+\begin_layout Plain Layout
+l
+\end_layout
+
+\end_inset
+
+) where 
+\begin_inset Quotes eld
+\end_inset
+
+l
+\begin_inset Quotes erd
+\end_inset
+
+ is the length of the returned path (Santoso, 2010).
+ The best case scenario time complexity for A* is Ω(1).
+ The memory complexity is roughly equal to the average amount of neighbors
+ any given vertex has in the graph.
 \end_layout
 
 \begin_layout Section
@@ -2265,8 +2338,10 @@ In general the subject of graph-related algorithms is an extremely nuanced
  part of mathematics in computing.
  There are countless real world applications, even for the algorithms discussed
  in this document (networking, GPS Navigation, logistics).
- The authors goal when writing this code was to write the most efficient
+ The author's goal when writing this code was to write the most efficient
  versions of these algorithms within his capabilities.
+ The red-black tree is a major improvement upon the standard breadth first
+ search open-queue.
  However, this is in no way a claim that there aren't any improvements to
  be made.
  With higher level functions such as this there are so many variables to
@@ -2279,8 +2354,22 @@ In general the subject of graph-related algorithms is an extremely nuanced
  that have been made.
 \end_layout
 
+\begin_layout Standard
+\begin_inset Newpage newpage
+\end_inset
+
+
+\end_layout
+
 \begin_layout Section
 References
+\end_layout
+
+\begin_layout Paragraph*
+Matoušek, J., Nešetřil, J., 1998.
+ Invitation to discrete mathematics.
+ Clarendon Press ; Oxford University Press, Oxford : Oxford , New York.
+ 
 \end_layout
 
 \begin_layout Paragraph*
